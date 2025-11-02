@@ -1,0 +1,67 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  createdAt    DateTime @default(now()) @map("created_at")
+  scenarios    Scenario[]
+
+  @@map("users")
+}
+
+model Property {
+  id              String     @id @default(cuid())
+  type            PropertyType
+  city            String
+  avgPricePerM2   Float      @map("avg_price_per_m2")
+  avgYieldPct     Float      @map("avg_yield_pct")
+  mgmtFeePct      Float      @map("mgmt_fee_pct")
+  scenarios       Scenario[]
+
+  @@map("properties")
+}
+
+model MarketData {
+  id              String   @id @default(cuid())
+  bankName        String   @map("bank_name")
+  interestRate    Float    @map("interest_rate")
+  loanTermYears   Int      @map("loan_term_years")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@map("market_data")
+}
+
+model Scenario {
+  id                  String   @id @default(cuid())
+  userId              String   @map("user_id")
+  propertyId          String   @map("property_id")
+  equityCapital       Float    @map("equity_capital")
+  loanPct             Float    @map("loan_pct")
+  investHorizonYears  Int      @map("invest_horizon_years")
+  calcResultJson      Json     @map("calc_result_json")
+  createdAt           DateTime @default(now()) @map("created_at")
+  
+  user     User     @relation(fields: [userId], references: [id])
+  property Property @relation(fields: [propertyId], references: [id])
+
+  @@map("scenarios")
+}
+
+enum PropertyType {
+  APARTMENT
+  LAND
+  SHOPHOUSE
+  OFFICETEL
+}
