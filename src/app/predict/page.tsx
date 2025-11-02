@@ -29,11 +29,9 @@ export default function PredictPage() {
   const [error, setError] = useState('')
   const [apiStatus, setApiStatus] = useState<'checking' | 'online' | 'offline'>('checking')
 
-  // Get ML API URL (Railway for production, localhost for dev)
+  // Get ML API URL (uses env var if set, otherwise localhost)
   const getMLApiUrl = () => {
-    if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
-      return 'http://localhost:8000'
-    }
+    // Priority: env variable > localhost
     return process.env.NEXT_PUBLIC_ML_API_URL || 'http://localhost:8000'
   }
 
