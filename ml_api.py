@@ -213,8 +213,10 @@ async def predict_price(request: PredictionRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":
+    import os
+    port = int(os.environ.get("PORT", 8000))
     print("Starting VN Real Estate Price Predictor API...")
-    print("API will be available at: http://localhost:8000")
-    print("Documentation at: http://localhost:8000/docs")
-    uvicorn.run(app, host="0.0.0.0", port=8000, log_level="info")
+    print(f"API will be available at: http://0.0.0.0:{port}")
+    print(f"Documentation at: http://0.0.0.0:{port}/docs")
+    uvicorn.run(app, host="0.0.0.0", port=port, log_level="info")
 
