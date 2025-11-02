@@ -56,8 +56,12 @@ class LocationsResponse(BaseModel):
     locations: List[str]
 
 def load_and_train_model():
-    """Load data and train the model on startup"""
+    """Load data and train the model (lazy loading)"""
     global model, le_location, le_district, feature_columns, available_locations
+    
+    # Return cached model if already loaded
+    if model is not None:
+        return
     
     print("Loading and training model...")
     
@@ -127,10 +131,8 @@ def load_and_train_model():
     print(f"Model trained successfully!")
     print(f"Available locations: {len(available_locations)}")
 
-@app.on_event("startup")
-async def startup_event():
-    """Load and train model when server starts"""
-    load_and_train_model()
+# Removed startup event - model trains on first request instead
+# This allows Render to detect the port immediately
 
 @app.get("/")
 async def root():
@@ -144,11 +146,14 @@ async def root():
 @app.get("/locations", response_model=LocationsResponse)
 async def get_locations():
     """Get list of available locations"""
+    load_and_train_model()  # Ensure model is loaded
     return LocationsResponse(locations=available_locations)
 
 @app.post("/predict", response_model=PredictionResponse)
 async def predict_price(request: PredictionRequest):
     """Predict real estate price based on input features"""
+    
+    load_and_train_model()  # Ensure model is loaded (lazy loading)
     
     if model is None:
         raise HTTPException(status_code=500, detail="Model not loaded")
