@@ -33,7 +33,7 @@ export default function PredictPage() {
   useEffect(() => {
     const checkAPIStatus = async () => {
       try {
-        const response = await fetch('http://localhost:8000/')
+        const response = await fetch('/api/predict')
         if (response.ok) {
           setApiStatus('online')
           loadLocations()
@@ -50,7 +50,7 @@ export default function PredictPage() {
 
   const loadLocations = async () => {
     try {
-      const response = await fetch('http://localhost:8000/locations')
+      const response = await fetch('/api/predict/locations')
       const data = await response.json()
       setLocations(data.locations)
       if (data.locations.length > 0) {
@@ -67,7 +67,7 @@ export default function PredictPage() {
     setIsLoading(true)
 
     try {
-      const response = await fetch('http://localhost:8000/predict', {
+      const response = await fetch('/api/predict', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -122,13 +122,13 @@ export default function PredictPage() {
                   Để sử dụng tính năng dự đoán giá ML, bạn cần khởi động Python API server:
                 </p>
                 <div className="bg-gray-900 text-white p-4 rounded-lg font-mono text-sm">
-                  <div className="mb-2"># Cài đặt dependencies</div>
+                  <div className="mb-2"># For local development:</div>
                   <div>pip install -r requirements_ml.txt</div>
-                  <div className="mt-4 mb-2"># Khởi động server</div>
                   <div>python ml_api.py</div>
+                  <div className="mt-4 mb-2"># Or deploy to Vercel (automatic)</div>
                 </div>
                 <p className="text-sm text-gray-600">
-                  Server sẽ chạy tại: <code className="bg-gray-200 px-2 py-1 rounded">http://localhost:8000</code>
+                  On Vercel, ML API runs automatically as serverless function
                 </p>
                 <Button 
                   onClick={() => window.location.reload()} 

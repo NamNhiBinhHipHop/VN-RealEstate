@@ -66,6 +66,8 @@ npm run db:seed
 
 ### Running the Application
 
+#### For Local Development:
+
 You need **two terminal windows**:
 
 **Terminal 1 - Next.js Frontend:**
@@ -74,7 +76,7 @@ npm run dev
 # Runs at http://localhost:3000
 ```
 
-**Terminal 2 - ML API Backend:**
+**Terminal 2 - ML API Backend (Optional):**
 ```bash
 source venv/bin/activate
 python ml_api.py
@@ -82,6 +84,13 @@ python ml_api.py
 ```
 
 **Open your browser:** http://localhost:3000
+
+#### For Production (Vercel):
+
+The ML API runs automatically as a Vercel serverless function!
+- No separate server needed
+- Deploys with your Next.js app
+- Scales automatically
 
 ---
 
@@ -142,10 +151,16 @@ curl -X POST http://localhost:8000/predict \
 
 ### API Endpoints
 
+**Local Development:**
 - `GET http://localhost:8000/` - Health check
 - `GET http://localhost:8000/locations` - List available locations
 - `POST http://localhost:8000/predict` - Predict price
 - `GET http://localhost:8000/docs` - API documentation (Swagger)
+
+**Production (Vercel):**
+- `GET /api/predict` - Health check
+- `GET /api/predict/locations` - List available locations
+- `POST /api/predict` - Predict price (serverless function)
 
 ---
 
