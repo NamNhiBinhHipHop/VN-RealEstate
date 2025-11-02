@@ -1,4 +1,17 @@
-# 🚂 Deploy ML API to Railway (FREE)
+# 🚀 Complete Deployment Guide
+
+## Quick Summary
+
+**Deploy to 2 services (both FREE):**
+1. **Railway** - Python ML API (backend)
+2. **Vercel** - Next.js App (frontend)
+
+**Total time: ~10 minutes**  
+**Total cost: $0** 🎉
+
+---
+
+# 🚂 Step 1: Deploy ML API to Railway (FREE)
 
 ## Why Railway?
 
@@ -10,18 +23,30 @@
 
 ---
 
-## 🚀 Step-by-Step Deployment
+---
 
-### 1. Push Code to GitHub First
+# 📝 Step 0: Push to GitHub
+
+### Push Code to GitHub
+
+**First time setup:**
 
 ```bash
 cd /Users/binh/Downloads/VN-REALESTATE-main
-git add -A
-git commit -m "Add Railway deployment config"
 git push -u origin main
 ```
 
-### 2. Deploy ML API to Railway
+**You'll need:**
+- Username: `NamNhiBinhHipHop`
+- Password: **Personal Access Token** from https://github.com/settings/tokens
+  - Create token with `repo` scope
+  - Use token as password
+
+---
+
+# 🚂 Step 1: Deploy ML API to Railway
+
+## Deploy to Railway
 
 1. **Go to [railway.app](https://railway.app)**
    - Sign up/Login with GitHub
@@ -46,7 +71,11 @@ git push -u origin main
    - Go to "Settings" → "Networking"
    - Copy the public URL (e.g., `https://your-app.up.railway.app`)
 
-### 3. Deploy Frontend to Vercel
+---
+
+# ☁️ Step 2: Deploy Frontend to Vercel
+
+## Deploy to Vercel
 
 1. **Go to [vercel.com](https://vercel.com)**
    - Sign in with GitHub
