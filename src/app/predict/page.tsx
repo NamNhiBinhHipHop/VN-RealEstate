@@ -50,7 +50,7 @@ export default function PredictPage() {
 
   const loadLocations = async () => {
     try {
-      const response = await fetch('/api/predict/locations')
+      const response = await fetch('/api/predict?locations=true')
       const data = await response.json()
       setLocations(data.locations)
       if (data.locations.length > 0) {

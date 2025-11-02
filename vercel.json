@@ -1,20 +1,5 @@
 {
   "buildCommand": "npm run db:generate && npm run build",
   "installCommand": "npm install",
-  "framework": "nextjs",
-  "functions": {
-    "api/predict.py": {
-      "maxDuration": 60
-    }
-  },
-  "rewrites": [
-    {
-      "source": "/api/predict",
-      "destination": "/api/predict.py"
-    },
-    {
-      "source": "/api/predict/locations",
-      "destination": "/api/predict.py"
-    }
-  ]
+  "framework": "nextjs"
 }
