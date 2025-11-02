@@ -25,7 +25,7 @@ export function formatPercent(num: number, decimals: number = 1): string {
   return `${formatNumber(num, decimals)}%`
 }
 
-export function debounce<T extends (...args: any[]) => any>(
+export function debounce<T extends (...args: unknown[]) => unknown>(
   func: T,
   wait: number
 ): (...args: Parameters<T>) => void {

@@ -53,12 +53,12 @@ class ApiClient {
   }
 
   // Market data endpoints
-  async getMarketData(city: string): Promise<{ city: string; properties: any[]; marketData: any[] }> {
+  async getMarketData(city: string): Promise<{ city: string; properties: unknown[]; marketData: unknown[] }> {
     return this.request(`/market/${encodeURIComponent(city)}`)
   }
 
   // Investment calculation
-  async calculateInvestment(input: any) {
+  async calculateInvestment(input: Record<string, unknown>) {
     return this.request('/calc/investment', {
       method: 'POST',
       body: JSON.stringify(input),
@@ -66,7 +66,7 @@ class ApiClient {
   }
 
   // Scenario management
-  async saveScenario(scenario: any) {
+  async saveScenario(scenario: Record<string, unknown>) {
     return this.request('/scenario/save', {
       method: 'POST',
       body: JSON.stringify(scenario),

@@ -116,7 +116,6 @@ export class InvestmentCalculator {
   static calculate(input: InvestmentInput): InvestmentResult {
     const propertyPrice = input.propertySize * input.pricePerM2
     const loanAmount = propertyPrice * (input.loanPct / 100)
-    const actualEquity = propertyPrice - loanAmount
     
     // Initial costs
     const transferTax = propertyPrice * 0.005 // 0.5%
