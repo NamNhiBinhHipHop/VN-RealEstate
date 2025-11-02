@@ -44,13 +44,18 @@ export default function PredictPage() {
     const checkAPIStatus = async () => {
       try {
         const apiUrl = getMLApiUrl()
+        const url = apiUrl ? `${apiUrl}/` : '/api/predict'
         const controller = new AbortController()
         const timeoutId = setTimeout(() => controller.abort(), 10000) // 10 second timeout
         
-        const response = await fetch(`${apiUrl}/`, {
+        console.log('Checking API at:', url) // Debug log
+        
+        const response = await fetch(url, {
           signal: controller.signal
         })
         clearTimeout(timeoutId)
+        
+        console.log('API response:', response.status) // Debug log
         
         if (response.ok) {
           setApiStatus('online')
@@ -70,11 +75,19 @@ export default function PredictPage() {
   const loadLocations = async () => {
     try {
       const apiUrl = getMLApiUrl()
-      const response = await fetch(`${apiUrl}/locations`)
+      const url = apiUrl ? `${apiUrl}/locations` : '/api/predict/locations'
+      const response = await fetch(url)
       const data = await response.json()
-      setLocations(data.locations)
-      if (data.locations.length > 0) {
-        setFormData(prev => ({ ...prev, location: data.locations[0] }))
+      
+      console.log('Locations response:', data) // Debug log
+      
+      if (data.locations && Array.isArray(data.locations)) {
+        setLocations(data.locations)
+        if (data.locations.length > 0) {
+          setFormData(prev => ({ ...prev, location: data.locations[0] }))
+        }
+      } else {
+        console.error('Invalid locations data:', data)
       }
     } catch (err) {
       console.error('Failed to load locations:', err)
@@ -88,7 +101,8 @@ export default function PredictPage() {
 
     try {
       const apiUrl = getMLApiUrl()
-      const response = await fetch(`${apiUrl}/predict`, {
+      const url = apiUrl ? `${apiUrl}/predict` : '/api/predict'
+      const response = await fetch(url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -44,21 +44,24 @@ class handler(BaseHTTPRequestHandler):
         self.end_headers()
         
         try:
-            if self.path == '/api/predict' or self.path == '/api':
+            # Vercel passes path with /api/predict prefix
+            path = self.path.replace('/api/predict', '')
+            
+            if path == '' or path == '/':
                 response = {
                     'status': 'online',
                     'message': 'VN Real Estate Price Predictor',
                     'version': '2.0.0'
                 }
-            elif self.path == '/api/predict/locations' or self.path == '/api/locations':
+            elif path == '/locations':
                 _, model_data = get_model_and_data()
                 response = {'locations': model_data['available_locations']}
             else:
-                response = {'error': 'Not found'}
+                response = {'error': 'Not found', 'path': self.path}
             
             self.wfile.write(json.dumps(response).encode())
         except Exception as e:
-            response = {'error': str(e)}
+            response = {'error': str(e), 'path': self.path}
             self.wfile.write(json.dumps(response).encode())
     
     def do_POST(self):
