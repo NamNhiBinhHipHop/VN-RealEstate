@@ -19,15 +19,10 @@ from typing import List, Optional
 
 app = FastAPI(title="VN Real Estate Price Predictor")
 
-# Enable CORS for Next.js (local + production)
+# Enable CORS for Next.js
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000", 
-        "http://127.0.0.1:3000",
-        "https://*.vercel.app",  # Allow all Vercel deployments
-        "*"  # Allow all origins (remove in production if needed)
-    ],
+    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -56,12 +51,8 @@ class LocationsResponse(BaseModel):
     locations: List[str]
 
 def load_and_train_model():
-    """Load data and train the model (lazy loading)"""
+    """Load data and train the model on startup"""
     global model, le_location, le_district, feature_columns, available_locations
-    
-    # Return cached model if already loaded
-    if model is not None:
-        return
     
     print("Loading and training model...")
     
@@ -131,8 +122,10 @@ def load_and_train_model():
     print(f"Model trained successfully!")
     print(f"Available locations: {len(available_locations)}")
 
-# Removed startup event - model trains on first request instead
-# This allows Render to detect the port immediately
+@app.on_event("startup")
+async def startup_event():
+    """Load and train model when server starts"""
+    load_and_train_model()
 
 @app.get("/")
 async def root():
@@ -146,14 +139,11 @@ async def root():
 @app.get("/locations", response_model=LocationsResponse)
 async def get_locations():
     """Get list of available locations"""
-    load_and_train_model()  # Ensure model is loaded
     return LocationsResponse(locations=available_locations)
 
 @app.post("/predict", response_model=PredictionResponse)
 async def predict_price(request: PredictionRequest):
     """Predict real estate price based on input features"""
-    
-    load_and_train_model()  # Ensure model is loaded (lazy loading)
     
     if model is None:
         raise HTTPException(status_code=500, detail="Model not loaded")
@@ -218,10 +208,8 @@ async def predict_price(request: PredictionRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":
-    import os
-    port = int(os.environ.get("PORT", 8000))
     print("Starting VN Real Estate Price Predictor API...")
-    print(f"API will be available at: http://0.0.0.0:{port}")
-    print(f"Documentation at: http://0.0.0.0:{port}/docs")
-    uvicorn.run(app, host="0.0.0.0", port=port, log_level="info")
+    print("API will be available at: http://localhost:8000")
+    print("Documentation at: http://localhost:8000/docs")
+    uvicorn.run(app, host="0.0.0.0", port=8000, log_level="info")
 

@@ -1,0 +1,3 @@
+# Minimal requirements for inference only (no training dependencies)
+lightgbm==4.6.0
+numpy==2.3.4

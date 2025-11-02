@@ -65,7 +65,3 @@ nohup.out
 *.db
 *.db-journal
 !prisma/dev.db
-
-# Model training outputs (keep the exported api/ files)
-/model_full.txt
-!api/model_full.txt

@@ -29,34 +29,11 @@ export default function PredictPage() {
   const [error, setError] = useState('')
   const [apiStatus, setApiStatus] = useState<'checking' | 'online' | 'offline'>('checking')
 
-  // Get ML API URL
-  const getMLApiUrl = () => {
-    // Check if we're on production (Vercel) - use serverless function
-    if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
-      return '' // Use relative URLs for Vercel serverless
-    }
-    // Local development - use env var or localhost
-    return process.env.NEXT_PUBLIC_ML_API_URL || 'http://localhost:8000'
-  }
-
   // Check ML API status
   useEffect(() => {
     const checkAPIStatus = async () => {
       try {
-        const apiUrl = getMLApiUrl()
-        const url = apiUrl ? `${apiUrl}/` : '/api/predict'
-        const controller = new AbortController()
-        const timeoutId = setTimeout(() => controller.abort(), 10000) // 10 second timeout
-        
-        console.log('Checking API at:', url) // Debug log
-        
-        const response = await fetch(url, {
-          signal: controller.signal
-        })
-        clearTimeout(timeoutId)
-        
-        console.log('API response:', response.status) // Debug log
-        
+        const response = await fetch('/api/predict')
         if (response.ok) {
           setApiStatus('online')
           loadLocations()
@@ -64,7 +41,6 @@ export default function PredictPage() {
           setApiStatus('offline')
         }
       } catch (err) {
-        console.error('API check failed:', err)
         setApiStatus('offline')
       }
     }
@@ -74,20 +50,11 @@ export default function PredictPage() {
 
   const loadLocations = async () => {
     try {
-      const apiUrl = getMLApiUrl()
-      const url = apiUrl ? `${apiUrl}/locations` : '/api/predict/locations'
-      const response = await fetch(url)
+      const response = await fetch('/api/predict/locations')
       const data = await response.json()
-      
-      console.log('Locations response:', data) // Debug log
-      
-      if (data.locations && Array.isArray(data.locations)) {
-        setLocations(data.locations)
-        if (data.locations.length > 0) {
-          setFormData(prev => ({ ...prev, location: data.locations[0] }))
-        }
-      } else {
-        console.error('Invalid locations data:', data)
+      setLocations(data.locations)
+      if (data.locations.length > 0) {
+        setFormData(prev => ({ ...prev, location: data.locations[0] }))
       }
     } catch (err) {
       console.error('Failed to load locations:', err)
@@ -100,9 +67,7 @@ export default function PredictPage() {
     setIsLoading(true)
 
     try {
-      const apiUrl = getMLApiUrl()
-      const url = apiUrl ? `${apiUrl}/predict` : '/api/predict'
-      const response = await fetch(url, {
+      const response = await fetch('/api/predict', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -131,9 +96,6 @@ export default function PredictPage() {
         <div className="container mx-auto px-4 py-20 text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <p className="text-gray-600">Kiểm tra kết nối ML API...</p>
-          <p className="text-sm text-gray-500 mt-2">
-            {process.env.NEXT_PUBLIC_ML_API_URL ? 'Đang đánh thức Render API...' : 'Đang kết nối localhost...'}
-          </p>
         </div>
       </div>
     )
