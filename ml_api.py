@@ -19,10 +19,15 @@ from typing import List, Optional
 
 app = FastAPI(title="VN Real Estate Price Predictor")
 
-# Enable CORS for Next.js
+# Enable CORS for Next.js (local + production)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
+    allow_origins=[
+        "http://localhost:3000", 
+        "http://127.0.0.1:3000",
+        "https://*.vercel.app",  # Allow all Vercel deployments
+        "*"  # Allow all origins (remove in production if needed)
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

@@ -29,11 +29,20 @@ export default function PredictPage() {
   const [error, setError] = useState('')
   const [apiStatus, setApiStatus] = useState<'checking' | 'online' | 'offline'>('checking')
 
+  // Get ML API URL (Railway for production, localhost for dev)
+  const getMLApiUrl = () => {
+    if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
+      return 'http://localhost:8000'
+    }
+    return process.env.NEXT_PUBLIC_ML_API_URL || 'http://localhost:8000'
+  }
+
   // Check ML API status
   useEffect(() => {
     const checkAPIStatus = async () => {
       try {
-        const response = await fetch('/api/predict')
+        const apiUrl = getMLApiUrl()
+        const response = await fetch(`${apiUrl}/`)
         if (response.ok) {
           setApiStatus('online')
           loadLocations()
@@ -50,7 +59,8 @@ export default function PredictPage() {
 
   const loadLocations = async () => {
     try {
-      const response = await fetch('/api/predict/locations')
+      const apiUrl = getMLApiUrl()
+      const response = await fetch(`${apiUrl}/locations`)
       const data = await response.json()
       setLocations(data.locations)
       if (data.locations.length > 0) {
@@ -67,7 +77,8 @@ export default function PredictPage() {
     setIsLoading(true)
 
     try {
-      const response = await fetch('/api/predict', {
+      const apiUrl = getMLApiUrl()
+      const response = await fetch(`${apiUrl}/predict`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
