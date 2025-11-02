@@ -1,5 +1,11 @@
 {
   "buildCommand": "npm run db:generate && npm run build",
   "installCommand": "npm install",
-  "framework": "nextjs"
+  "framework": "nextjs",
+  "functions": {
+    "api/*.py": {
+      "runtime": "python3.9",
+      "maxDuration": 30
+    }
+  }
 }

@@ -29,9 +29,13 @@ export default function PredictPage() {
   const [error, setError] = useState('')
   const [apiStatus, setApiStatus] = useState<'checking' | 'online' | 'offline'>('checking')
 
-  // Get ML API URL (uses env var if set, otherwise localhost)
+  // Get ML API URL
   const getMLApiUrl = () => {
-    // Priority: env variable > localhost
+    // Check if we're on production (Vercel) - use serverless function
+    if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
+      return '' // Use relative URLs for Vercel serverless
+    }
+    // Local development - use env var or localhost
     return process.env.NEXT_PUBLIC_ML_API_URL || 'http://localhost:8000'
   }
 
@@ -40,7 +44,14 @@ export default function PredictPage() {
     const checkAPIStatus = async () => {
       try {
         const apiUrl = getMLApiUrl()
-        const response = await fetch(`${apiUrl}/`)
+        const controller = new AbortController()
+        const timeoutId = setTimeout(() => controller.abort(), 10000) // 10 second timeout
+        
+        const response = await fetch(`${apiUrl}/`, {
+          signal: controller.signal
+        })
+        clearTimeout(timeoutId)
+        
         if (response.ok) {
           setApiStatus('online')
           loadLocations()
@@ -48,6 +59,7 @@ export default function PredictPage() {
           setApiStatus('offline')
         }
       } catch (err) {
+        console.error('API check failed:', err)
         setApiStatus('offline')
       }
     }
@@ -105,6 +117,9 @@ export default function PredictPage() {
         <div className="container mx-auto px-4 py-20 text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <p className="text-gray-600">Kiểm tra kết nối ML API...</p>
+          <p className="text-sm text-gray-500 mt-2">
+            {process.env.NEXT_PUBLIC_ML_API_URL ? 'Đang đánh thức Render API...' : 'Đang kết nối localhost...'}
+          </p>
         </div>
       </div>
     )
