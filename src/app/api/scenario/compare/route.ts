@@ -4,7 +4,7 @@ import { withAuth } from '@/lib/auth'
 import { z } from 'zod'
 
 const compareScenarioSchema = z.object({
-  scenarioIds: z.array(z.string()).min(2, 'Cần ít nhất 2 kịch bản để so sánh').max(5, 'Tối đa 5 kịch bản')
+  scenarioIds: z.array(z.string()).min(2, 'Select at least two scenarios to compare').max(5, 'You can compare up to five scenarios at once')
 })
 
 export const POST = withAuth(async (request: NextRequest, user) => {
@@ -32,7 +32,7 @@ export const POST = withAuth(async (request: NextRequest, user) => {
 
     if (scenarios.length !== scenarioIds.length) {
       return NextResponse.json(
-        { error: 'Một số kịch bản không tồn tại hoặc không thuộc về bạn' },
+        { error: 'Some scenarios were not found or do not belong to your account.' },
         { status: 404 }
       )
     }
@@ -111,7 +111,7 @@ export const POST = withAuth(async (request: NextRequest, user) => {
 
     console.error('Compare scenarios error:', error)
     return NextResponse.json(
-      { error: 'Lỗi server' },
+      { error: 'Server error' },
       { status: 500 }
     )
   }

@@ -24,28 +24,28 @@ export function InvestmentResults({ data, onSaveScenario }: InvestmentResultsPro
   // Prepare chart data for monthly cashflow
   const monthlyChartData = result.monthlyData.slice(0, 60).map((month: any) => ({
     month: month.month,
-    'Thu nhập thuê': month.rentalIncome,
-    'Trả nợ': -month.loanPayment,
-    'Phí quản lý': -month.mgmtFee,
-    'Dòng tiền ròng': month.netCashflow
+    'Rental income': month.rentalIncome,
+    'Debt service': -month.loanPayment,
+    'Management fee': -month.mgmtFee,
+    'Net cash flow': month.netCashflow
   }))
 
   // Prepare scenario comparison data
   const scenarioData = [
     {
-      scenario: 'Bi quan',
+      scenario: 'Pessimistic',
       roi: result.scenarios.pessimistic.roi,
       irr: result.scenarios.pessimistic.irr,
       finalValue: result.scenarios.pessimistic.totalEquity
     },
     {
-      scenario: 'Cơ sở',
+      scenario: 'Base case',
       roi: result.scenarios.base.roi,
       irr: result.scenarios.base.irr,
       finalValue: result.scenarios.base.totalEquity
     },
     {
-      scenario: 'Lạc quan',
+      scenario: 'Optimistic',
       roi: result.scenarios.optimistic.roi,
       irr: result.scenarios.optimistic.irr,
       finalValue: result.scenarios.optimistic.totalEquity
@@ -67,13 +67,13 @@ export function InvestmentResults({ data, onSaveScenario }: InvestmentResultsPro
         calcResult: result
       })
       
-      setSaveMessage('Đã lưu kịch bản thành công!')
+      setSaveMessage('Scenario saved successfully!')
       if (onSaveScenario) onSaveScenario()
     } catch (err) {
       if (err instanceof ApiError) {
-        setSaveMessage(`Lỗi: ${err.message}`)
+        setSaveMessage(`Error: ${err.message}`)
       } else {
-        setSaveMessage('Không thể lưu kịch bản')
+        setSaveMessage('Unable to save this scenario.')
       }
     } finally {
       setIsSaving(false)
@@ -88,7 +88,7 @@ export function InvestmentResults({ data, onSaveScenario }: InvestmentResultsPro
           <CardHeader>
             <CardTitle className="flex items-center text-orange-800">
               <AlertTriangle className="h-5 w-5 mr-2" />
-              Cảnh báo rủi ro
+              Risk alerts
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -107,7 +107,7 @@ export function InvestmentResults({ data, onSaveScenario }: InvestmentResultsPro
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Giá bất động sản</p>
+                <p className="text-sm text-gray-600">Property value</p>
                 <p className="text-lg font-bold">{formatCurrency(result.propertyPrice)}</p>
               </div>
               <DollarSign className="h-8 w-8 text-blue-500" />
@@ -119,7 +119,7 @@ export function InvestmentResults({ data, onSaveScenario }: InvestmentResultsPro
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Số tiền vay</p>
+                <p className="text-sm text-gray-600">Loan amount</p>
                 <p className="text-lg font-bold">{formatCurrency(result.loanAmount)}</p>
               </div>
               <TrendingUp className="h-8 w-8 text-green-500" />
@@ -131,7 +131,7 @@ export function InvestmentResults({ data, onSaveScenario }: InvestmentResultsPro
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Chi phí ban đầu</p>
+                <p className="text-sm text-gray-600">Upfront costs</p>
                 <p className="text-lg font-bold">{formatCurrency(result.initialCosts.total)}</p>
               </div>
               <Calendar className="h-8 w-8 text-orange-500" />
@@ -143,7 +143,7 @@ export function InvestmentResults({ data, onSaveScenario }: InvestmentResultsPro
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Dòng tiền hàng tháng</p>
+                <p className="text-sm text-gray-600">Monthly cash flow</p>
                 <p className="text-lg font-bold">
                   {formatCurrency(result.monthlyData[0]?.netCashflow || 0)}
                 </p>
@@ -157,9 +157,9 @@ export function InvestmentResults({ data, onSaveScenario }: InvestmentResultsPro
       {/* Scenario Comparison */}
       <Card>
         <CardHeader>
-          <CardTitle>So sánh kịch bản</CardTitle>
+          <CardTitle>Scenario comparison</CardTitle>
           <CardDescription>
-            ROI và IRR theo các kịch bản tăng trưởng khác nhau
+            ROI and IRR under different growth assumptions.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -169,15 +169,15 @@ export function InvestmentResults({ data, onSaveScenario }: InvestmentResultsPro
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="scenario" />
                 <YAxis />
-                <Tooltip 
+                <Tooltip
                   formatter={(value: any, name: string) => [
                     name === 'finalValue' ? formatCurrency(value) : `${formatNumber(value, 1)}%`,
-                    name === 'roi' ? 'ROI (%/năm)' : 
-                    name === 'irr' ? 'IRR (%)' : 'Giá trị cuối kỳ'
+                    name === 'roi' ? 'ROI (%/year)' :
+                    name === 'irr' ? 'IRR (%)' : 'Ending equity'
                   ]}
                 />
                 <Legend />
-                <Bar dataKey="roi" fill="#3b82f6" name="ROI (%/năm)" />
+                <Bar dataKey="roi" fill="#3b82f6" name="ROI (%/year)" />
                 <Bar dataKey="irr" fill="#10b981" name="IRR (%)" />
               </BarChart>
             </ResponsiveContainer>
@@ -187,9 +187,9 @@ export function InvestmentResults({ data, onSaveScenario }: InvestmentResultsPro
             {scenarioData.map((scenario, index) => (
               <div key={index} className="text-center p-3 bg-gray-50 rounded">
                 <h4 className="font-medium">{scenario.scenario}</h4>
-                <p className="text-gray-600">ROI: {formatPercent(scenario.roi)}/năm</p>
+                <p className="text-gray-600">ROI: {formatPercent(scenario.roi)}/year</p>
                 <p className="text-gray-600">IRR: {formatPercent(scenario.irr)}</p>
-                <p className="text-gray-600">Giá trị: {formatCurrency(scenario.finalValue)}</p>
+                <p className="text-gray-600">Ending equity: {formatCurrency(scenario.finalValue)}</p>
               </div>
             ))}
           </div>
@@ -199,9 +199,9 @@ export function InvestmentResults({ data, onSaveScenario }: InvestmentResultsPro
       {/* Monthly Cashflow Chart */}
       <Card>
         <CardHeader>
-          <CardTitle>Dòng tiền hàng tháng (5 năm đầu)</CardTitle>
+          <CardTitle>Monthly cash flow (first 5 years)</CardTitle>
           <CardDescription>
-            Theo dõi thu nhập, chi phí và dòng tiền ròng
+            Track rental income, expenses, and net cash flow over time.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -213,9 +213,9 @@ export function InvestmentResults({ data, onSaveScenario }: InvestmentResultsPro
                 <YAxis tickFormatter={(value) => formatCurrency(value).replace('₫', '')} />
                 <Tooltip formatter={(value: any) => formatCurrency(value)} />
                 <Legend />
-                <Line type="monotone" dataKey="Thu nhập thuê" stroke="#10b981" strokeWidth={2} />
-                <Line type="monotone" dataKey="Trả nợ" stroke="#ef4444" strokeWidth={2} />
-                <Line type="monotone" dataKey="Dòng tiền ròng" stroke="#3b82f6" strokeWidth={3} />
+                <Line type="monotone" dataKey="Rental income" stroke="#10b981" strokeWidth={2} />
+                <Line type="monotone" dataKey="Debt service" stroke="#ef4444" strokeWidth={2} />
+                <Line type="monotone" dataKey="Net cash flow" stroke="#3b82f6" strokeWidth={3} />
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -225,25 +225,25 @@ export function InvestmentResults({ data, onSaveScenario }: InvestmentResultsPro
       {/* Detailed Breakdown */}
       <Card>
         <CardHeader>
-          <CardTitle>Chi tiết chi phí ban đầu</CardTitle>
+          <CardTitle>Upfront cost breakdown</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
             <div className="flex justify-between">
-              <span>Thuế chuyển nhượng (0.5%):</span>
+              <span>Transfer tax (0.5%):</span>
               <span className="font-medium">{formatCurrency(result.initialCosts.transferTax)}</span>
             </div>
             <div className="flex justify-between">
-              <span>Phí công chứng (0.1%):</span>
+              <span>Notary fee (0.1%):</span>
               <span className="font-medium">{formatCurrency(result.initialCosts.notaryFee)}</span>
             </div>
             <div className="flex justify-between">
-              <span>Phí môi giới (1.5%):</span>
+              <span>Brokerage fee (1.5%):</span>
               <span className="font-medium">{formatCurrency(result.initialCosts.brokerageFee)}</span>
             </div>
             <hr className="my-2" />
             <div className="flex justify-between font-bold">
-              <span>Tổng chi phí:</span>
+              <span>Total upfront costs:</span>
               <span>{formatCurrency(result.initialCosts.total)}</span>
             </div>
           </div>
@@ -256,9 +256,9 @@ export function InvestmentResults({ data, onSaveScenario }: InvestmentResultsPro
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <h4 className="font-medium">Lưu kịch bản này</h4>
+                <h4 className="font-medium">Save this scenario</h4>
                 <p className="text-sm text-gray-600">
-                  Lưu để so sánh với các kịch bản khác sau này
+                  Store the current run so you can compare it later.
                 </p>
               </div>
               <Button
@@ -267,11 +267,11 @@ export function InvestmentResults({ data, onSaveScenario }: InvestmentResultsPro
                 className="flex items-center space-x-2"
               >
                 <Save className="h-4 w-4" />
-                <span>{isSaving ? 'Đang lưu...' : 'Lưu kịch bản'}</span>
+                <span>{isSaving ? 'Saving...' : 'Save scenario'}</span>
               </Button>
             </div>
             {saveMessage && (
-              <p className={`mt-2 text-sm ${saveMessage.includes('Lỗi') ? 'text-red-600' : 'text-green-600'}`}>
+              <p className={`mt-2 text-sm ${saveMessage.toLowerCase().includes('error') ? 'text-red-600' : 'text-green-600'}`}>
                 {saveMessage}
               </p>
             )}

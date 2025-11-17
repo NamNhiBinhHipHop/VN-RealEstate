@@ -4,8 +4,8 @@ import { AuthService } from '@/lib/auth'
 import { z } from 'zod'
 
 const loginSchema = z.object({
-  email: z.string().email('Email không hợp lệ'),
-  password: z.string().min(1, 'Mật khẩu không được để trống')
+  email: z.string().email('Invalid email address'),
+  password: z.string().min(1, 'Password is required')
 })
 
 export async function POST(request: NextRequest) {
@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
 
     if (!user) {
       return NextResponse.json(
-        { error: 'Email hoặc mật khẩu không đúng' },
+        { error: 'Incorrect email or password' },
         { status: 401 }
       )
     }
@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
     
     if (!isValidPassword) {
       return NextResponse.json(
-        { error: 'Email hoặc mật khẩu không đúng' },
+        { error: 'Incorrect email or password' },
         { status: 401 }
       )
     }
@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
     })
 
     return NextResponse.json({
-      message: 'Đăng nhập thành công',
+      message: 'Login successful',
       token,
       user: {
         id: user.id,
@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
 
     console.error('Login error:', error)
     return NextResponse.json(
-      { error: 'Lỗi server' },
+      { error: 'Server error' },
       { status: 500 }
     )
   }

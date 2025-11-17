@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "VN Real Estate Investment Calculator",
-  description: "Công cụ tính toán đầu tư bất động sản Việt Nam",
+  description: "LightGBM-powered real-estate investment analytics for Vietnam.",
 };
 
 export default function RootLayout({
@@ -24,7 +24,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="vi">
+    <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >

@@ -1,138 +1,268 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { promises as fs } from 'fs'
+import path from 'path'
 
-// Simple in-memory cache for model predictions
-const predictionCache = new Map<string, { predicted_price: number; price_per_sqm: number; bedrooms: number; area: number; location: string }>()
+type LightGBMTreeNode = {
+  split_feature?: number
+  threshold?: number
+  decision_type?: string
+  default_left?: boolean
+  left_child?: LightGBMTreeNode
+  right_child?: LightGBMTreeNode
+  leaf_value?: number
+}
+
+type LightGBMTree = {
+  tree_index: number
+  shrinkage?: number
+  tree_structure: LightGBMTreeNode
+}
+
+type LightGBMModel = {
+  feature_names: string[]
+  tree_info: LightGBMTree[]
+  average_output?: number
+  num_trees?: number
+}
+
+type EncoderCache = {
+  locations: string[]
+  districts: string[]
+  locationIndex: Map<string, number>
+  districtIndex: Map<string, number>
+}
+
+const MODEL_PATH = path.join(process.cwd(), 'api', 'model.json')
+const ENCODER_PATH = path.join(process.cwd(), 'api', 'encoders.json')
+
+let cachedModel: LightGBMModel | null = null
+let cachedEncoders: EncoderCache | null = null
+
+async function loadModel(): Promise<LightGBMModel> {
+  if (cachedModel) {
+    return cachedModel
+  }
+
+  const raw = await fs.readFile(MODEL_PATH, 'utf-8')
+  cachedModel = JSON.parse(raw) as LightGBMModel
+  return cachedModel
+}
+
+async function loadEncoders(): Promise<EncoderCache> {
+  if (cachedEncoders) {
+    return cachedEncoders
+  }
+
+  const raw = await fs.readFile(ENCODER_PATH, 'utf-8')
+  const parsed = JSON.parse(raw) as { locations: string[]; districts: string[] }
+
+  cachedEncoders = {
+    locations: parsed.locations,
+    districts: parsed.districts,
+    locationIndex: new Map(parsed.locations.map((loc, idx) => [loc, idx])),
+    districtIndex: new Map(parsed.districts.map((district, idx) => [district, idx])),
+  }
+
+  return cachedEncoders
+}
+
+function extractDistrict(location: string): string {
+  const primary = location.split(',')[0].trim()
+  const cleaned = primary.replace(/^Quận\s+/i, '').replace(/^Huyện\s+/i, '').trim()
+  return cleaned.length > 0 ? cleaned : primary
+}
+
+function normalize(text: string): string {
+  return (text ?? '')
+    .normalize('NFC')
+    .toLowerCase()
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
+function findLocationIndex(encoders: EncoderCache, location: string): number | undefined {
+  const direct = encoders.locationIndex.get(location)
+  if (direct !== undefined) {
+    return direct
+  }
+
+  const normalizedTarget = normalize(location)
+  for (const [loc, idx] of encoders.locationIndex.entries()) {
+    if (normalize(loc) === normalizedTarget) {
+      return idx
+    }
+  }
+
+  const district = normalize(extractDistrict(location))
+  for (const [loc, idx] of encoders.locationIndex.entries()) {
+    if (normalize(loc).includes(district)) {
+      return idx
+    }
+  }
+
+  return undefined
+}
+
+function findDistrictIndex(encoders: EncoderCache, location: string): number | undefined {
+  const district = extractDistrict(location)
+  const direct = encoders.districtIndex.get(district)
+  if (direct !== undefined) {
+    return direct
+  }
+
+  const normalized = normalize(district)
+  for (const [name, idx] of encoders.districtIndex.entries()) {
+    if (normalize(name) === normalized) {
+      return idx
+    }
+  }
+
+  return undefined
+}
+
+function evaluateNode(node: LightGBMTreeNode | undefined, features: number[]): number {
+  if (!node) {
+    return 0
+  }
+
+  if (typeof node.leaf_value === 'number') {
+    return node.leaf_value
+  }
+
+  const featureIndex = node.split_feature ?? 0
+  const featureValue = features[featureIndex] ?? 0
+  const threshold = node.threshold ?? 0
+  const decisionType = node.decision_type ?? '<='
+  const defaultLeft = node.default_left ?? true
+
+  let goLeft: boolean
+  switch (decisionType) {
+    case '<=':
+    case '≤':
+      goLeft = featureValue <= threshold || (Number.isNaN(featureValue) && defaultLeft)
+      break
+    case '<':
+      goLeft = featureValue < threshold || (Number.isNaN(featureValue) && defaultLeft)
+      break
+    case '>':
+      goLeft = featureValue > threshold || (!Number.isNaN(featureValue) && !defaultLeft)
+      break
+    case '>=':
+    case '≥':
+      goLeft = featureValue >= threshold || (!Number.isNaN(featureValue) && !defaultLeft)
+      break
+    case '==':
+      goLeft = featureValue === threshold
+      break
+    default:
+      goLeft = featureValue <= threshold
+  }
+
+  const nextNode = goLeft ? node.left_child : node.right_child
+  return evaluateNode(nextNode, features)
+}
+
+function predict(model: LightGBMModel, features: number[]): number {
+  const base = model.average_output ?? 0
+  return model.tree_info.reduce(
+    (sum, tree) => sum + evaluateNode(tree.tree_structure, features),
+    base
+  )
+}
 
 export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url)
-  
-  if (searchParams.get('locations') === 'true') {
-    // Return hardcoded locations (from training data)
-    const locations = [
-      "Huyện Bình Chánh, Hồ Chí Minh",
-      "Huyện Củ Chi, Hồ Chí Minh",
-      "Huyện Hóc Môn, Hồ Chí Minh",
-      "Huyện Nhà Bè, Hồ Chí Minh",
-      "Quận 1, Hồ Chí Minh",
-      "Quận 2, Hồ Chí Minh",
-      "Quận 3, Hồ Chí Minh",
-      "Quận 4, Hồ Chí Minh",
-      "Quận 5, Hồ Chí Minh",
-      "Quận 6, Hồ Chí Minh",
-      "Quận 7, Hồ Chí Minh",
-      "Quận 8, Hồ Chí Minh",
-      "Quận 9, Hồ Chí Minh",
-      "Quận 10, Hồ Chí Minh",
-      "Quận 11, Hồ Chí Minh",
-      "Quận 12, Hồ Chí Minh",
-      "Quận Bình Thạnh, Hồ Chí Minh",
-      "Quận Bình Tân, Hồ Chí Minh",
-      "Quận Gò Vấp, Hồ Chí Minh",
-      "Quận Phú Nhuận, Hồ Chí Minh",
-      "Quận Tân Bình, Hồ Chí Minh",
-      "Quận Tân Phú, Hồ Chí Minh"
-    ]
-    
-    return NextResponse.json({ locations })
+  try {
+    const model = await loadModel()
+    const encoders = await loadEncoders()
+    const { searchParams } = new URL(request.url)
+
+    if (searchParams.get('locations') === 'true') {
+      return NextResponse.json({ locations: encoders.locations })
+    }
+
+    return NextResponse.json({
+      status: 'online',
+      message: 'VN Real Estate LightGBM predictor (pre-trained)',
+      model: 'LightGBM Gradient Boosting Decision Tree',
+      num_trees: model.num_trees ?? model.tree_info.length,
+      feature_count: model.feature_names.length,
+      locations: encoders.locations.length,
+      districts: encoders.districts.length,
+    })
+  } catch (error) {
+    return NextResponse.json(
+      {
+        error: 'Failed to load model artifacts',
+        details: String(error),
+      },
+      { status: 500 }
+    )
   }
-  
-  return NextResponse.json({
-    status: 'online',
-    message: 'VN Real Estate Price Predictor',
-    version: '2.0.0',
-    model: 'District-based regression with area/bedroom adjustments'
-  })
 }
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { bedrooms, area, location } = body
-    
+    const bedrooms = Number(body.bedrooms)
+    const area = Number(body.area)
+    const location = typeof body.location === 'string' ? body.location.trim() : ''
+
     if (!bedrooms || !area || !location) {
       return NextResponse.json(
         { error: 'Missing required fields: bedrooms, area, location' },
         { status: 400 }
       )
     }
-    
-    // Create a cache key
-    const cacheKey = `${bedrooms}-${area}-${location}`
-    
-    // Check cache first
-    if (predictionCache.has(cacheKey)) {
-      return NextResponse.json(predictionCache.get(cacheKey))
+
+    if (bedrooms <= 0 || area <= 0) {
+      return NextResponse.json(
+        { error: 'Bedrooms and area must be greater than 0' },
+        { status: 400 }
+      )
     }
-    
-    // District-based pricing model (derived from analyzing 6,246 properties)
-    // These are average price/sqm in billion VND from the training data
-    const districtPrices: Record<string, number> = {
-      'Quận 1': 0.28,
-      'Quận 2': 0.12,
-      'Quận 3': 0.20,
-      'Quận 4': 0.15,
-      'Quận 5': 0.14,
-      'Quận 6': 0.13,
-      'Quận 7': 0.18,
-      'Quận 8': 0.11,
-      'Quận 9': 0.10,
-      'Quận 10': 0.16,
-      'Quận 11': 0.14,
-      'Quận 12': 0.09,
-      'Quận Bình Thạnh': 0.14,
-      'Quận Bình Tân': 0.08,
-      'Quận Gò Vấp': 0.10,
-      'Quận Phú Nhuận': 0.17,
-      'Quận Tân Bình': 0.15,
-      'Quận Tân Phú': 0.11,
-      'Huyện Bình Chánh': 0.06,
-      'Huyện Củ Chi': 0.05,
-      'Huyện Hóc Môn': 0.06,
-      'Huyện Nhà Bè': 0.07
+
+    const [model, encoders] = await Promise.all([loadModel(), loadEncoders()])
+    const locationIndex = findLocationIndex(encoders, location)
+    const districtIndex = findDistrictIndex(encoders, location)
+
+    if (locationIndex === undefined || districtIndex === undefined) {
+      return NextResponse.json(
+        {
+          error: 'Location not found in trained dataset',
+          hint: 'Use GET /api/predict?locations=true for supported values',
+        },
+        { status: 400 }
+      )
     }
-    
-    // Extract district from location
-    const district = location.split(',')[0].trim()
-    const basePricePerSqm = districtPrices[district] || 0.10
-    
-    // Bedroom adjustment (more bedrooms = slight premium)
-    const bedroomMultiplier = 1 + (bedrooms - 2) * 0.05
-    
-    // Area adjustment (larger properties = slight discount per sqm)
-    const areaMultiplier = area > 100 ? 0.95 : area < 50 ? 1.1 : 1.0
-    
-    // Calculate predicted price
-    const pricePerSqm = basePricePerSqm * bedroomMultiplier * areaMultiplier
-    const predicted_price = pricePerSqm * area
-    
-    // Add realistic variance (±10%)
-    const variance = 1 + (Math.random() - 0.5) * 0.2
-    const final_price = predicted_price * variance
-    
-    const result = {
-      predicted_price: parseFloat(final_price.toFixed(2)),
-      price_per_sqm: parseFloat((final_price / area).toFixed(4)),
+
+    const bedroomDensity = bedrooms / area
+    const featureMap: Record<string, number> = {
       bedrooms,
       area,
-      location
+      location_encoded: locationIndex,
+      district_encoded: districtIndex,
+      bedroom_density: bedroomDensity,
     }
-    
-    // Cache the result
-    predictionCache.set(cacheKey, result)
-    
-    // Limit cache size to 1000 entries
-    if (predictionCache.size > 1000) {
-      const firstKey = predictionCache.keys().next().value
-      if (firstKey) predictionCache.delete(firstKey)
-    }
-    
-    return NextResponse.json(result)
-    
+
+    const featureVector = model.feature_names.map((name) => featureMap[name] ?? 0)
+    const predictedPrice = predict(model, featureVector)
+
+    return NextResponse.json({
+      predicted_price: Number(predictedPrice.toFixed(2)),
+      price_per_sqm: Number((predictedPrice / area).toFixed(4)),
+      bedrooms,
+      area,
+      location,
+      method: 'LightGBM gradient boosting (pre-trained)',
+    })
   } catch (error) {
-    console.error('Prediction error:', error)
     return NextResponse.json(
-      { error: 'Prediction failed', details: String(error) },
+      {
+        error: 'Prediction failed',
+        details: String(error),
+      },
       { status: 500 }
     )
   }
 }
+

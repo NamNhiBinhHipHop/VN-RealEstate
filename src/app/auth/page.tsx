@@ -23,7 +23,7 @@ export default function AuthPage() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Đang tải...</p>
+          <p className="text-gray-600">Loading...</p>
         </div>
       </div>
     )
@@ -45,7 +45,7 @@ export default function AuthPage() {
             </span>
           </div>
           <p className="text-gray-600">
-            Công cụ tính toán đầu tư bất động sản thông minh
+            Smart investment analytics for the Vietnamese real-estate market.
           </p>
         </div>
 
@@ -59,8 +59,8 @@ export default function AuthPage() {
         {/* Demo Note */}
         <div className="mt-6 text-center text-sm text-gray-500">
           <p>
-            Bạn có thể sử dụng tài khoản demo:<br />
-            Email: demo@vnreit.com | Mật khẩu: demo123
+            Use the demo account to explore:<br />
+            Email: demo@vnreit.com | Password: demo123
           </p>
         </div>
       </div>

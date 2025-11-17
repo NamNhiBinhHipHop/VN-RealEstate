@@ -21,29 +21,29 @@ export function Header() {
         {user ? (
           <div className="flex items-center space-x-4">
             <nav className="hidden md:flex items-center space-x-6">
-              <Link 
-                href="/calculator" 
+              <Link
+                href="/calculator"
                 className="text-gray-600 hover:text-gray-900 font-medium"
               >
-                Tính toán
+                Calculator
               </Link>
-              <Link 
-                href="/predict" 
+              <Link
+                href="/predict"
                 className="text-purple-600 hover:text-purple-900 font-medium"
               >
-                Dự Đoán ML
+                ML Pricing
               </Link>
-              <Link 
-                href="/scenarios" 
+              <Link
+                href="/scenarios"
                 className="text-gray-600 hover:text-gray-900 font-medium"
               >
-                Kịch bản
+                Scenarios
               </Link>
-              <Link 
-                href="/compare" 
+              <Link
+                href="/compare"
                 className="text-gray-600 hover:text-gray-900 font-medium"
               >
-                So sánh
+                Compare
               </Link>
             </nav>
             
@@ -59,13 +59,13 @@ export function Header() {
               className="flex items-center space-x-1"
             >
               <LogOut className="h-4 w-4" />
-              <span>Đăng xuất</span>
+              <span>Sign out</span>
             </Button>
           </div>
         ) : (
           <div className="flex items-center space-x-2">
             <Link href="/auth">
-              <Button variant="outline">Đăng nhập</Button>
+              <Button variant="outline">Sign in</Button>
             </Link>
           </div>
         )}

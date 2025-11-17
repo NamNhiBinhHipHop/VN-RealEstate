@@ -80,9 +80,9 @@ export interface Scenario {
 }
 
 export const PROPERTY_TYPES = {
-  APARTMENT: 'Căn hộ',
-  LAND: 'Đất nền',
-  SHOPHOUSE: 'Nhà phố thương mại',
+  APARTMENT: 'Apartment',
+  LAND: 'Land plot',
+  SHOPHOUSE: 'Shophouse',
   OFFICETEL: 'Officetel'
 } as const
 

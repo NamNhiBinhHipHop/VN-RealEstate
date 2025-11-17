@@ -15,7 +15,7 @@ interface InvestmentFormProps {
 
 export function InvestmentForm({ onCalculate, isLoading }: InvestmentFormProps) {
   const [formData, setFormData] = useState({
-    equityCapital: 2000000000, // 2 tỷ VND
+    equityCapital: 2000000000, // 2B VND starting point
     loanPct: 70,
     propertySize: 80, // 80m2
     city: 'Hanoi',
@@ -73,13 +73,13 @@ export function InvestmentForm({ onCalculate, isLoading }: InvestmentFormProps) 
     setError('')
 
     if (!selectedProperty) {
-      setError('Không tìm thấy dữ liệu bất động sản cho loại và thành phố này')
+      setError('No property data is available for this city and property type.')
       return
     }
 
     const requiredEquity = calculateRequiredEquity()
     if (formData.equityCapital < requiredEquity) {
-      setError(`Vốn chủ sở hữu không đủ. Cần tối thiểu ${formatCurrency(requiredEquity)}`)
+      setError(`Insufficient equity. You need at least ${formatCurrency(requiredEquity)}.`)
       return
     }
 
@@ -90,7 +90,7 @@ export function InvestmentForm({ onCalculate, isLoading }: InvestmentFormProps) 
       if (err instanceof ApiError) {
         setError(err.message)
       } else {
-        setError('Đã xảy ra lỗi khi tính toán')
+        setError('An unexpected error occurred while running the calculation.')
       }
     }
   }
@@ -98,9 +98,9 @@ export function InvestmentForm({ onCalculate, isLoading }: InvestmentFormProps) 
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle>Thông tin đầu tư</CardTitle>
+        <CardTitle>Investment details</CardTitle>
         <CardDescription>
-          Nhập thông tin để tính toán khả năng đầu tư bất động sản
+          Provide the core assumptions to evaluate financing, returns, and risk.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -112,9 +112,9 @@ export function InvestmentForm({ onCalculate, isLoading }: InvestmentFormProps) 
           )}
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Vốn chủ sở hữu */}
+            {/* Equity */}
             <div className="space-y-2">
-              <label className="text-sm font-medium">Vốn chủ sở hữu (VND)</label>
+              <label className="text-sm font-medium">Equity capital (VND)</label>
               <Input
                 type="number"
                 value={formData.equityCapital}
@@ -128,9 +128,9 @@ export function InvestmentForm({ onCalculate, isLoading }: InvestmentFormProps) 
               </p>
             </div>
 
-            {/* Tỷ lệ vay */}
+            {/* Loan percentage */}
             <div className="space-y-2">
-              <label className="text-sm font-medium">Tỷ lệ vay (%)</label>
+              <label className="text-sm font-medium">Loan-to-value (%)</label>
               <Input
                 type="number"
                 value={formData.loanPct}
@@ -141,9 +141,9 @@ export function InvestmentForm({ onCalculate, isLoading }: InvestmentFormProps) 
               />
             </div>
 
-            {/* Thành phố */}
+            {/* City */}
             <div className="space-y-2">
-              <label className="text-sm font-medium">Thành phố</label>
+              <label className="text-sm font-medium">City</label>
               <select
                 value={formData.city}
                 onChange={(e) => handleInputChange('city', e.target.value)}
@@ -155,9 +155,9 @@ export function InvestmentForm({ onCalculate, isLoading }: InvestmentFormProps) 
               </select>
             </div>
 
-            {/* Loại bất động sản */}
+            {/* Property type */}
             <div className="space-y-2">
-              <label className="text-sm font-medium">Loại bất động sản</label>
+              <label className="text-sm font-medium">Property type</label>
               <select
                 value={formData.propertyType}
                 onChange={(e) => handleInputChange('propertyType', e.target.value)}
@@ -169,9 +169,9 @@ export function InvestmentForm({ onCalculate, isLoading }: InvestmentFormProps) 
               </select>
             </div>
 
-            {/* Diện tích */}
+            {/* Size */}
             <div className="space-y-2">
-              <label className="text-sm font-medium">Diện tích (m²)</label>
+              <label className="text-sm font-medium">Size (m²)</label>
               <Input
                 type="number"
                 value={formData.propertySize}
@@ -181,9 +181,9 @@ export function InvestmentForm({ onCalculate, isLoading }: InvestmentFormProps) 
               />
             </div>
 
-            {/* Thời gian đầu tư */}
+            {/* Investment horizon */}
             <div className="space-y-2">
-              <label className="text-sm font-medium">Thời gian đầu tư (năm)</label>
+              <label className="text-sm font-medium">Investment horizon (years)</label>
               <Input
                 type="number"
                 value={formData.investHorizonYears}
@@ -194,51 +194,51 @@ export function InvestmentForm({ onCalculate, isLoading }: InvestmentFormProps) 
               />
             </div>
 
-            {/* Ngân hàng */}
+            {/* Bank */}
             <div className="space-y-2 md:col-span-2">
-              <label className="text-sm font-medium">Ngân hàng (tùy chọn)</label>
+              <label className="text-sm font-medium">Preferred bank (optional)</label>
               <select
                 value={formData.bankId}
                 onChange={(e) => handleInputChange('bankId', e.target.value)}
                 className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
               >
-                <option value="">Chọn ngân hàng có lãi suất tốt nhất</option>
+                <option value="">Select the lender with the best rate</option>
                 {marketData?.marketData.map(bank => (
                   <option key={bank.id} value={bank.id}>
-                    {bank.bankName} - {bank.interestRate}%/năm
+                    {bank.bankName} - {bank.interestRate}%/year
                   </option>
                 ))}
               </select>
             </div>
           </div>
 
-          {/* Thông tin tóm tắt */}
+          {/* Summary */}
           {selectedProperty && (
             <div className="bg-gray-50 p-4 rounded-lg space-y-2">
-              <h4 className="font-medium text-gray-900">Thông tin dự kiến:</h4>
+              <h4 className="font-medium text-gray-900">Quick summary:</h4>
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
-                  <span className="text-gray-600">Giá BĐS:</span>
+                  <span className="text-gray-600">Property value:</span>
                   <span className="ml-2 font-medium">{formatCurrency(calculatePropertyPrice())}</span>
                 </div>
                 <div>
-                  <span className="text-gray-600">Số tiền vay:</span>
+                  <span className="text-gray-600">Loan amount:</span>
                   <span className="ml-2 font-medium">{formatCurrency(calculateLoanAmount())}</span>
                 </div>
                 <div>
-                  <span className="text-gray-600">Vốn cần thiết:</span>
+                  <span className="text-gray-600">Required equity:</span>
                   <span className="ml-2 font-medium">{formatCurrency(calculateRequiredEquity())}</span>
                 </div>
                 <div>
-                  <span className="text-gray-600">Tỷ suất thuê dự kiến:</span>
-                  <span className="ml-2 font-medium">{selectedProperty.avgYieldPct}%/năm</span>
+                  <span className="text-gray-600">Rental yield:</span>
+                  <span className="ml-2 font-medium">{selectedProperty.avgYieldPct}%/year</span>
                 </div>
               </div>
             </div>
           )}
 
           <Button type="submit" className="w-full" disabled={isLoading || !selectedProperty}>
-            {isLoading ? 'Đang tính toán...' : 'Tính toán đầu tư'}
+            {isLoading ? 'Calculating...' : 'Calculate investment'}
           </Button>
         </form>
       </CardContent>

@@ -61,7 +61,7 @@ export const POST = withAuth(async (request: NextRequest, user) => {
 
     if (!property) {
       return NextResponse.json(
-        { error: 'Không tìm thấy bất động sản' },
+        { error: 'Property not found.' },
         { status: 404 }
       )
     }
@@ -82,7 +82,7 @@ export const POST = withAuth(async (request: NextRequest, user) => {
     })
 
     return NextResponse.json({
-      message: 'Lưu kịch bản thành công',
+      message: 'Scenario saved successfully',
       scenario: {
         id: scenario.id,
         equityCapital: scenario.equityCapital,
@@ -106,7 +106,7 @@ export const POST = withAuth(async (request: NextRequest, user) => {
 
     console.error('Save scenario error:', error)
     return NextResponse.json(
-      { error: 'Lỗi server' },
+      { error: 'Server error' },
       { status: 500 }
     )
   }

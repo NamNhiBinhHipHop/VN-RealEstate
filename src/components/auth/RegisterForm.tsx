@@ -27,7 +27,7 @@ export function RegisterForm({ onToggleMode }: RegisterFormProps) {
     setError('')
 
     if (password !== confirmPassword) {
-      setError('Mật khẩu xác nhận không khớp')
+      setError('Confirmation password does not match.')
       setIsLoading(false)
       return
     }
@@ -38,7 +38,7 @@ export function RegisterForm({ onToggleMode }: RegisterFormProps) {
       if (err instanceof ApiError) {
         setError(err.message)
       } else {
-        setError('Đã xảy ra lỗi không mong muốn')
+        setError('An unexpected error occurred.')
       }
     } finally {
       setIsLoading(false)
@@ -48,9 +48,9 @@ export function RegisterForm({ onToggleMode }: RegisterFormProps) {
   return (
     <Card className="w-full max-w-md">
       <CardHeader>
-        <CardTitle>Đăng ký</CardTitle>
+        <CardTitle>Create an account</CardTitle>
         <CardDescription>
-          Tạo tài khoản mới để bắt đầu tính toán đầu tư bất động sản
+          Sign up to run calculations, compare scenarios, and save your work.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -63,14 +63,14 @@ export function RegisterForm({ onToggleMode }: RegisterFormProps) {
           
           <div className="space-y-2">
             <label htmlFor="name" className="text-sm font-medium">
-              Họ và tên
+              Full name
             </label>
             <Input
               id="name"
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Nguyễn Văn A"
+              placeholder="Jane Doe"
               required
             />
           </div>
@@ -91,7 +91,7 @@ export function RegisterForm({ onToggleMode }: RegisterFormProps) {
           
           <div className="space-y-2">
             <label htmlFor="password" className="text-sm font-medium">
-              Mật khẩu
+              Password
             </label>
             <Input
               id="password"
@@ -105,7 +105,7 @@ export function RegisterForm({ onToggleMode }: RegisterFormProps) {
           
           <div className="space-y-2">
             <label htmlFor="confirmPassword" className="text-sm font-medium">
-              Xác nhận mật khẩu
+              Confirm password
             </label>
             <Input
               id="confirmPassword"
@@ -118,7 +118,7 @@ export function RegisterForm({ onToggleMode }: RegisterFormProps) {
           </div>
           
           <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? 'Đang đăng ký...' : 'Đăng ký'}
+            {isLoading ? 'Creating account...' : 'Create account'}
           </Button>
           
           <div className="text-center">
@@ -127,7 +127,7 @@ export function RegisterForm({ onToggleMode }: RegisterFormProps) {
               onClick={onToggleMode}
               className="text-sm text-blue-600 hover:underline"
             >
-              Đã có tài khoản? Đăng nhập
+              Already have an account? Sign in
             </button>
           </div>
         </form>

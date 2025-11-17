@@ -21,24 +21,24 @@ export default function Home() {
             VN Real Estate Investment Calculator
           </h1>
           <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto">
-            Công cụ tính toán đầu tư bất động sản thông minh cho thị trường Việt Nam
+            A modern toolset for modeling Vietnamese real-estate investments, cash flow, and risk.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/predict">
               <Button size="lg" className="bg-gradient-to-r from-purple-600 to-purple-700 text-white hover:from-purple-700 hover:to-purple-800 shadow-lg">
-                🤖 Dự Đoán Giá ML
+                🤖 ML Price Prediction
               </Button>
             </Link>
             {user ? (
               <Link href="/calculator">
                 <Button size="lg" className="bg-white text-blue-600 hover:bg-gray-100">
-                  Bắt đầu tính toán
+                  Open Calculator
                 </Button>
               </Link>
             ) : (
               <Link href="/auth">
                 <Button size="lg" className="bg-white text-blue-600 hover:bg-gray-100">
-                  Đăng ký miễn phí
+                  Create a free account
                 </Button>
               </Link>
             )}
@@ -51,10 +51,10 @@ export default function Home() {
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Tính toán đầu tư chính xác và toàn diện
+              Complete investment analytics in one place
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Phân tích ROI, IRR, dòng tiền và rủi ro với dữ liệu thị trường thực tế
+              Model ROI, IRR, cash flow, and risk with live Vietnamese market data.
             </p>
           </div>
 
@@ -63,9 +63,9 @@ export default function Home() {
               <Card className="text-center cursor-pointer hover:shadow-xl transition-all duration-300 border-2 border-purple-200 bg-gradient-to-br from-purple-50 to-white">
                 <CardHeader>
                   <Sparkles className="h-12 w-12 text-purple-600 mx-auto mb-4 animate-pulse" />
-                  <CardTitle className="text-purple-900">Dự Đoán Giá ML ⭐</CardTitle>
+                  <CardTitle className="text-purple-900">ML Pricing ⭐</CardTitle>
                   <CardDescription className="text-purple-700">
-                    Trí tuệ nhân tạo dự đoán giá từ 6,000+ bất động sản thực tế
+                    Gradient-boosting model trained on 6,000+ verified transactions.
                   </CardDescription>
                 </CardHeader>
               </Card>
@@ -74,9 +74,9 @@ export default function Home() {
             <Card className="text-center">
               <CardHeader>
                 <Calculator className="h-12 w-12 text-blue-600 mx-auto mb-4" />
-                <CardTitle>Tính toán chính xác</CardTitle>
+                <CardTitle>Precision formulas</CardTitle>
                 <CardDescription>
-                  Công thức tài chính chuẩn quốc tế với dữ liệu thị trường Việt Nam
+                  Institutional-grade cash-flow and loan math tailored to Vietnam.
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -84,9 +84,9 @@ export default function Home() {
             <Card className="text-center">
               <CardHeader>
                 <TrendingUp className="h-12 w-12 text-green-600 mx-auto mb-4" />
-                <CardTitle>Phân tích đa kịch bản</CardTitle>
+                <CardTitle>Scenario planning</CardTitle>
                 <CardDescription>
-                  So sánh kịch bản lạc quan, cơ sở và bi quan để đánh giá rủi ro
+                  Compare optimistic, base, and conservative cases side by side.
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -94,9 +94,9 @@ export default function Home() {
             <Card className="text-center">
               <CardHeader>
                 <BarChart3 className="h-12 w-12 text-purple-600 mx-auto mb-4" />
-                <CardTitle>Biểu đồ trực quan</CardTitle>
+                <CardTitle>Visual dashboards</CardTitle>
                 <CardDescription>
-                  Hiển thị dòng tiền, ROI, IRR qua biểu đồ dễ hiểu
+                  Highlight IRR, ROI, and monthly cash flow with clean charts.
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -104,9 +104,9 @@ export default function Home() {
             <Card className="text-center">
               <CardHeader>
                 <Building className="h-12 w-12 text-orange-600 mx-auto mb-4" />
-                <CardTitle>Đa loại BĐS</CardTitle>
+                <CardTitle>Property coverage</CardTitle>
                 <CardDescription>
-                  Hỗ trợ căn hộ, đất nền, shophouse, officetel tại các thành phố lớn
+                  Apartments, land, shophouses, officetels across major cities.
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -114,9 +114,9 @@ export default function Home() {
             <Card className="text-center">
               <CardHeader>
                 <Users className="h-12 w-12 text-red-600 mx-auto mb-4" />
-                <CardTitle>So sánh kịch bản</CardTitle>
+                <CardTitle>Portfolio tracking</CardTitle>
                 <CardDescription>
-                  Lưu trữ và so sánh nhiều kịch bản đầu tư khác nhau
+                  Save multiple scenarios and benchmark them instantly.
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -124,9 +124,9 @@ export default function Home() {
             <Card className="text-center">
               <CardHeader>
                 <Shield className="h-12 w-12 text-indigo-600 mx-auto mb-4" />
-                <CardTitle>Cảnh báo rủi ro</CardTitle>
+                <CardTitle>Risk alerts</CardTitle>
                 <CardDescription>
-                  Phát hiện các rủi ro tiềm ẩn và đưa ra khuyến nghị
+                  Flag leverage, yield, and liquidity issues before you commit.
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -139,10 +139,10 @@ export default function Home() {
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Cách thức hoạt động
+              How it works
             </h2>
             <p className="text-xl text-gray-600">
-              Chỉ 3 bước đơn giản để có báo cáo đầu tư chi tiết
+              Three quick steps to a complete investment memo.
             </p>
           </div>
 
@@ -151,9 +151,9 @@ export default function Home() {
               <div className="bg-blue-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl font-bold text-blue-600">1</span>
               </div>
-              <h3 className="text-xl font-semibold mb-2">Nhập thông tin</h3>
+              <h3 className="text-xl font-semibold mb-2">Capture inputs</h3>
               <p className="text-gray-600">
-                Vốn chủ sở hữu, tỷ lệ vay, loại BĐS và thành phố
+                Equity, leverage, property type, and target city.
               </p>
             </div>
 
@@ -161,9 +161,9 @@ export default function Home() {
               <div className="bg-green-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl font-bold text-green-600">2</span>
               </div>
-              <h3 className="text-xl font-semibold mb-2">Tính toán tự động</h3>
+              <h3 className="text-xl font-semibold mb-2">Run the models</h3>
               <p className="text-gray-600">
-                Hệ thống phân tích dựa trên dữ liệu thị trường thực tế
+                Cash flow, loan schedules, and ML pricing in seconds.
               </p>
             </div>
 
@@ -171,9 +171,9 @@ export default function Home() {
               <div className="bg-purple-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl font-bold text-purple-600">3</span>
               </div>
-              <h3 className="text-xl font-semibold mb-2">Nhận báo cáo</h3>
+              <h3 className="text-xl font-semibold mb-2">Review the report</h3>
               <p className="text-gray-600">
-                ROI, IRR, dòng tiền và cảnh báo rủi ro chi tiết
+                Shareable ROI, IRR, cash flow, and risk alerts.
               </p>
             </div>
           </div>
@@ -184,21 +184,21 @@ export default function Home() {
       <section className="py-20 bg-gray-900 text-white">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Sẵn sàng bắt đầu đầu tư thông minh?
+            Ready to invest with confidence?
           </h2>
           <p className="text-xl mb-8 max-w-2xl mx-auto">
-            Tham gia cùng hàng nghìn nhà đầu tư đã sử dụng công cụ của chúng tôi
+            Join thousands of Vietnamese investors who rely on our analytics.
           </p>
           {user ? (
             <Link href="/calculator">
               <Button size="lg" className="bg-blue-600 hover:bg-blue-700">
-                Tính toán ngay
+                Launch calculator
               </Button>
             </Link>
           ) : (
             <Link href="/auth">
               <Button size="lg" className="bg-blue-600 hover:bg-blue-700">
-                Đăng ký miễn phí
+                Get started for free
               </Button>
             </Link>
           )}
@@ -215,33 +215,33 @@ export default function Home() {
                 <span className="text-lg font-bold">VN Real Estate Calculator</span>
               </div>
               <p className="text-gray-400">
-                Công cụ tính toán đầu tư bất động sản hàng đầu Việt Nam
+                The end-to-end investment toolkit for Vietnam’s real-estate market.
               </p>
             </div>
             
             <div>
-              <h4 className="font-semibold mb-4">Sản phẩm</h4>
+              <h4 className="font-semibold mb-4">Product</h4>
               <ul className="space-y-2 text-gray-400">
-                <li><Link href="/calculator" className="hover:text-white">Tính toán đầu tư</Link></li>
-                <li><Link href="/scenarios" className="hover:text-white">Quản lý kịch bản</Link></li>
-                <li><Link href="/compare" className="hover:text-white">So sánh</Link></li>
+                <li><Link href="/calculator" className="hover:text-white">Investment calculator</Link></li>
+                <li><Link href="/scenarios" className="hover:text-white">Scenario manager</Link></li>
+                <li><Link href="/compare" className="hover:text-white">Compare deals</Link></li>
               </ul>
             </div>
             
             <div>
-              <h4 className="font-semibold mb-4">Hỗ trợ</h4>
+              <h4 className="font-semibold mb-4">Support</h4>
               <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white">Hướng dẫn sử dụng</a></li>
+                <li><a href="#" className="hover:text-white">Product guide</a></li>
                 <li><a href="#" className="hover:text-white">FAQ</a></li>
-                <li><a href="#" className="hover:text-white">Liên hệ</a></li>
+                <li><a href="#" className="hover:text-white">Contact</a></li>
               </ul>
             </div>
             
             <div>
-              <h4 className="font-semibold mb-4">Pháp lý</h4>
+              <h4 className="font-semibold mb-4">Legal</h4>
               <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white">Điều khoản sử dụng</a></li>
-                <li><a href="#" className="hover:text-white">Chính sách bảo mật</a></li>
+                <li><a href="#" className="hover:text-white">Terms of use</a></li>
+                <li><a href="#" className="hover:text-white">Privacy policy</a></li>
               </ul>
             </div>
           </div>

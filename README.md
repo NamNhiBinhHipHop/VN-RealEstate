@@ -1,15 +1,15 @@
 # VN Real Estate Investment Calculator
 
-A sophisticated Next.js application for analyzing real estate investments in Vietnam with **ML-powered price prediction** using LightGBM trained on 6,000+ real properties.
+A sophisticated Next.js application for analyzing real estate investments in Vietnam with **LightGBM-powered price prediction** trained on 6,000+ verified Ho Chi Minh City properties.
 
 ## 🌟 Features
 
-### 🤖 **ML Price Prediction** (NEW!)
-- **Machine Learning** powered by LightGBM (Gradient Boosted Trees)
-- **Pre-trained** on **6,246 real properties** from Ho Chi Minh City
-- Predict prices based on bedrooms, area, and location
-- **23 districts** supported in HCMC
-- **Optimized for Vercel** - serverless deployment ready!
+### 🤖 **LightGBM Price Prediction**
+- Mô hình Gradient Boosting huấn luyện trên **6,246** giao dịch thật
+- Dự đoán giá theo phòng ngủ, diện tích và khu vực cụ thể
+- **23+ khu vực** tại TP. Hồ Chí Minh
+- Xuất giá/m², kết quả chuẩn hóa theo dữ liệu lịch sử
+- Mô hình đã huấn luyện sẵn, chỉ cần commit file tree → chạy trực tiếp trên Vercel
 
 ### 💰 **Investment Calculator**
 - Calculate ROI, IRR, and monthly cash flow
@@ -21,16 +21,11 @@ A sophisticated Next.js application for analyzing real estate investments in Vie
 - User authentication (JWT-based)
 - Scenario management (save & compare)
 - Real bank interest rates
-- Responsive design with Tailwind CSS
+- Beautiful responsive UI with Tailwind CSS
 
 ---
 
 ## 🚀 Quick Start
-
-### Prerequisites
-
-- Node.js 18+
-- Python 3.8+ (for local ML development)
 
 ### Installation
 
@@ -39,64 +34,75 @@ A sophisticated Next.js application for analyzing real estate investments in Vie
 git clone https://github.com/NamNhiBinhHipHop/VN-RealEstate.git
 cd VN-RealEstate
 
-# 2. Install Node.js dependencies
+# 2. Install dependencies
 npm install
 
-# 3. Set up environment variables
+# 3. Set up environment
 cp .env.example .env
-# Edit .env with your values
 
-# 4. Set up the database
+# 4. Set up database
 npm run db:generate
 npm run db:push
 npm run db:seed
 
-# 5. Run the development server
+# 5. Run dev server
 npm run dev
 ```
 
-**Open your browser:** http://localhost:3000
+**Open:** http://localhost:3000
 
 ---
 
-## 🤖 ML Model Architecture
+## 🤖 LightGBM Price Estimation
 
-### How It Works
+### Cách hoạt động
 
-**Training (Local - One Time):**
+1. Chạy `python train_model.py` (hoặc dùng file đã commit) để huấn luyện LightGBM với dữ liệu `Data/merged_properties.csv`.
+2. Script tự động xuất:
+   - `api/model.json`: toàn bộ cây quyết định để Next.js sử dụng
+   - `api/encoders.json`: mapping location/district → index
+   - `api/model.txt`, `api/encoders.pkl`, `api/metadata.json` (tham khảo)
+3. Next.js API `/api/predict` nạp các file này, thực thi toàn bộ 140 cây để trả về giá dự đoán.
+
+**Input người dùng:**
+- Phòng ngủ (1-10)
+- Diện tích (m²)
+- Khu vực (23+ quận/huyện TP.HCM)
+
+**Quy trình dự đoán:**
+1. Encode location/district thành chỉ số giống hệt khi huấn luyện
+2. Tính `bedroom_density = bedrooms / area`
+3. Tạo vector đặc trưng theo đúng thứ tự LightGBM (`bedrooms`, `area`, `location_encoded`, `district_encoded`, `bedroom_density`)
+4. Duyệt lần lượt 140 cây (Gradient Boosting) để cộng dồn giá trị dự đoán
+
+**Kết quả:**
+- Giá dự đoán (tỷ VND)
+- Giá/m²
+- Nguồn mô hình: “LightGBM gradient boosting (pre-trained)”
+
+### Huấn luyện lại (tùy chọn)
+
 ```bash
-# Install training dependencies
+python3 -m venv .venv
+source .venv/bin/activate
 pip install -r requirements_ml.txt
-
-# Train and save model
 python train_model.py
 ```
 
-This creates:
-- `api/model.txt` - Pre-trained LightGBM model (319KB)
-- `api/encoders.pkl` - Label encoders (1.3KB)
-- `api/metadata.json` - Model info (1KB)
+Script sẽ tạo/ghi đè các file trong thư mục `api/`. Commit chúng trước khi deploy lên Vercel.
 
-**Inference (Production - Vercel):**
-- Serverless function loads pre-trained model
-- No training needed (instant startup!)
-- Only requires: `lightgbm` + `numpy` (~50MB total)
-- Well under Vercel's 250MB limit
+### Supported Locations
 
-### Model Performance
-
-- **Training Data**: 6,246 properties
-- **Algorithm**: LightGBM (79 iterations)
-- **MAE**: 9.0 billion VND
-- **RMSE**: 22.8 billion VND
-- **Features**: bedrooms, area, location, district, bedroom_density
+**23 Districts in Ho Chi Minh City:**
+- Quận 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
+- Quận Bình Thạnh, Bình Tân, Gò Vấp, Phú Nhuận, Tân Bình, Tân Phú
+- Huyện Bình Chánh, Củ Chi, Hóc Môn, Nhà Bè
 
 ---
 
 ## 📦 Available Scripts
 
 ```bash
-# Next.js
 npm run dev          # Start development server
 npm run build        # Build for production
 npm run start        # Start production server
@@ -105,36 +111,35 @@ npm run lint         # Run ESLint
 # Database
 npm run db:generate  # Generate Prisma client
 npm run db:push      # Push schema to database
-npm run db:seed      # Seed database
-
-# ML (Local Development)
-python ml_api.py     # Start FastAPI server (localhost:8000)
-python train_model.py # Re-train model with new data
+npm run db:seed      # Seed with sample data
+npm run db:studio    # Open Prisma Studio GUI
 ```
 
 ---
 
-## 🌐 Deployment to Vercel
+## 🌐 Deploy to Vercel
 
-### Simple One-Click Deploy
+### One-Click Deploy
 
-1. **Push to GitHub** (already done!)
-   ```bash
-   git push -u origin main
-   ```
-
+1. **Push to GitHub** ✅ (Already done!)
+   
 2. **Import to Vercel**
    - Go to [vercel.com](https://vercel.com)
    - Click "Add New Project"
-   - Import `NamNhiBinhHipHop/VN-RealEstate`
+   - Import: `NamNhiBinhHipHop/VN-RealEstate`
 
-3. **Add Environment Variables**
+3. **Environment Variables**
    ```
    DATABASE_URL=file:./prisma/dev.db
-   JWT_SECRET=<your-secret-32-char-string>
+   JWT_SECRET=<generate-32-char-random>
+   ```
+   
+   Generate JWT:
+   ```bash
+   node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
    ```
 
-4. **Build Command** (Important!)
+4. **Build Command**
    ```
    npm run db:generate && npm run build
    ```
@@ -143,188 +148,130 @@ python train_model.py # Re-train model with new data
 
 ### Everything Works on Vercel!
 
-✅ Next.js Frontend
-✅ All Pages & UI
+✅ Homepage & UI
 ✅ Authentication
 ✅ ROI/IRR Calculator
-✅ **ML Price Prediction** (optimized serverless!)
+✅ **LightGBM Price Prediction** (pure TypeScript runtime!)
 ✅ Database
-✅ All APIs
+✅ All API routes
 
-**No separate ML deployment needed!** The Python ML function runs as a Vercel serverless function.
-
----
-
-## 🔧 How ML Works on Vercel
-
-### Architecture
-
-```
-User Request → Vercel Serverless Function → Load Pre-trained Model → Predict → Return JSON
-                     ↓
-                api/predict.py (6KB)
-                     ↓
-          Loads: model.txt (319KB)
-                 encoders.pkl (1.3KB)
-                     ↓
-              Quick Prediction!
-```
-
-### Why It's Fast
-
-- **Pre-trained model** - No training on each request
-- **Cached in memory** - Model loads once per function instance
-- **Minimal dependencies** - Only `lightgbm` + `numpy`
-- **Small model files** - 320KB total
-- **Total package** - ~50MB (well under 250MB limit!)
+**No Python deployment needed at runtime!** Mô hình LightGBM đã được convert sang JSON và chạy trực tiếp trong API route.
 
 ---
 
 ## 🗄️ Database Schema
 
-Using **Prisma ORM**:
+Using **Prisma ORM** with 4 models:
 
-- **User**: User accounts with authentication
-- **Property**: Real estate property data (prices, yields, fees)
-- **MarketData**: Bank interest rates and loan terms
-- **Scenario**: Saved investment calculations
+- **User**: Authentication
+- **Property**: Real estate data (prices, yields, fees)
+- **MarketData**: Bank interest rates
+- **Scenario**: Saved calculations
 
 ---
 
 ## 🔐 API Endpoints
 
 ### Authentication
-- `POST /api/auth/register` - Register new user
+- `POST /api/auth/register` - Register user
 - `POST /api/auth/login` - Login user
 
-### Market Data
-- `GET /api/market/[city]` - Get property and market data
-
-### Investment Calculation
-- `POST /api/calc/investment` - Calculate investment returns
-
-### ML Prediction (Serverless)
+### Prediction (LightGBM)
 - `GET /api/predict` - Health check
-- `GET /api/predict/locations` - List 23 available locations
-- `POST /api/predict` - Predict price
+- `GET /api/predict?locations=true` - List locations
+- `POST /api/predict` - LightGBM price prediction
 
-### Scenario Management (Protected)
-- `POST /api/scenario/save` - Save investment scenario
-- `GET /api/scenario/list` - List user's scenarios
-- `POST /api/scenario/compare` - Compare multiple scenarios
+### Market Data
+- `GET /api/market/[city]` - Get property data
+
+### Investment Calculator
+- `POST /api/calc/investment` - Calculate ROI/IRR
+
+### Scenarios (Protected)
+- `POST /api/scenario/save` - Save scenario
+- `GET /api/scenario/list` - List scenarios
+- `POST /api/scenario/compare` - Compare scenarios
 
 ---
 
 ## 🛠️ Tech Stack
 
-**Frontend:**
-- Next.js 15 (App Router, Turbopack)
-- React 19
-- TypeScript
-- Tailwind CSS 4
-
-**Backend:**
-- Prisma ORM
-- SQLite (dev) / PostgreSQL (production)
-- JWT Authentication
-
-**ML:**
-- LightGBM (Gradient Boosted Trees)
-- NumPy
-- Pre-trained on 6,246 properties
-- Vercel Python serverless runtime
+- **Framework**: Next.js 15 (App Router, Turbopack)
+- **Language**: TypeScript
+- **UI**: React 19, Tailwind CSS 4
+- **Database**: Prisma ORM (SQLite/PostgreSQL)
+- **Auth**: JWT + bcryptjs
+- **AI**: LightGBM (pre-trained, JSON runtime)
+- **Validation**: Zod
+- **Charts**: Recharts
 
 ---
 
-## 📊 ML Model Details
+## 📊 Project Structure
 
-### Training Process
-
-```bash
-# Run this locally to re-train (optional)
-pip install -r requirements_ml.txt
-python train_model.py
+```
+VN-RealEstate/
+├── src/
+│   ├── app/
+│   │   ├── page.tsx              # Homepage
+│   │   ├── auth/                 # Auth pages
+│   │   ├── calculator/           # ROI/IRR calculator
+│   │   ├── predict/              # LightGBM price prediction UI
+│   │   └── api/
+│   │       ├── auth/             # Auth endpoints
+│   │       ├── calc/             # Calculator endpoints
+│   │       ├── predict/          # LightGBM inference endpoint ⭐
+│   │       ├── market/           # Market data
+│   │       └── scenario/         # Scenario management
+│   ├── components/               # React components
+│   ├── contexts/                 # React contexts
+│   └── lib/                      # Utilities & types
+├── prisma/
+│   ├── schema.prisma             # Database schema
+│   └── dev.db                    # SQLite database
+├── Data/
+│   └── merged_properties.csv     # Training data (6,246 properties)
+├── api/
+│   ├── model.json                # Exported tree structures (used by API)
+│   ├── encoders.json             # Location/district mappings
+│   ├── model.txt / encoders.pkl  # Original LightGBM artifacts (optional)
+│   └── metadata.json             # Training metadata
+└── .env.example                  # Environment template
 ```
 
-This trains LightGBM on your data and saves:
-- Trained model
-- Label encoders
-- Metadata
-
-### Model Features
-
-**Input:**
-1. Number of bedrooms (1-10)
-2. Area in m² (20-500)
-3. Location (23 HCMC districts)
-4. District (extracted from location)
-5. Bedroom density (bedrooms/area)
-
-**Output:**
-- Predicted price (billion VND)
-- Price per square meter
-
-### Supported Locations
-
-All 23 districts in Ho Chi Minh City including:
-- Quận 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
-- Quận Bình Thạnh, Bình Tân, Gò Vấp, Phú Nhuận, Tân Bình, Tân Phú
-- Huyện Bình Chánh, Củ Chi, Hóc Môn, Nhà Bè
-
 ---
 
-## 🎯 Production Deployment
+## 🎯 Why This Solution is Better
 
-### For PostgreSQL (Recommended)
+### **Old Approach** (Before):
+- ❌ Python serverless function vượt quá 250MB
+- ❌ Người dùng phải tự chạy FastAPI để dự đoán
+- ❌ Khó debug, phụ thuộc runtime Python khi deploy
 
-Update `prisma/schema.prisma`:
+### **Current Approach** (Now):
+- ✅ LightGBM vẫn giữ nguyên độ chính xác, nhưng toàn bộ tree được convert sang JSON
+- ✅ Next.js API route tự duyệt 140 cây → không cần Python
+- ✅ Commits chỉ cần kèm các file trong thư mục `api/`
+- ✅ Người dùng cuối không phải huấn luyện hoặc cài ML
 
-```prisma
-datasource db {
-  provider = "postgresql"  // Change from sqlite
-  url      = env("DATABASE_URL")
-}
-```
-
-Then in Vercel:
-1. Add Vercel Postgres storage
-2. Update DATABASE_URL environment variable
-3. Run migrations: `npx prisma migrate deploy`
-4. Seed: `npm run db:seed`
-
----
-
-## 📈 Package Size Optimization
-
-**Before Optimization:**
-- Dependencies: pandas, scikit-learn, lightgbm, numpy
-- Training on every request
-- Size: >250MB ❌ (Vercel limit exceeded)
-
-**After Optimization:**
-- Dependencies: lightgbm, numpy ONLY
-- Pre-trained model loaded from files
-- Size: ~50MB ✅ (5x smaller!)
-
-**Model files included in repo:**
-- `api/model.txt` - 319KB (LightGBM model)
-- `api/encoders.pkl` - 1.3KB (label encoders)
-- `api/metadata.json` - 1KB (model info)
-
-Total: **~320KB** of model files!
+**Độ tin cậy dữ liệu & mô hình:**
+- ✅ 6,246 bất động sản thật tại TP.HCM
+- ✅ 23+ quận/huyện
+- ✅ 5 đặc trưng: phòng ngủ, diện tích, location/district encoded, bedroom density
+- ✅ Gradient Boosting với 140 cây, LR 0.02, regularization đầy đủ
 
 ---
 
 ## 🧪 Testing
 
 ```bash
-# Test locally
-npm run dev
+# Test API
+curl http://localhost:3000/api/predict
 
-# Test ML API locally (optional)
-python ml_api.py  # Runs on localhost:8000
+# Get locations
+curl 'http://localhost:3000/api/predict?locations=true'
 
-# Test API endpoint
+# Predict price
 curl -X POST http://localhost:3000/api/predict \
   -H "Content-Type: application/json" \
   -d '{
@@ -336,45 +283,51 @@ curl -X POST http://localhost:3000/api/predict \
 
 ---
 
-## 🏗️ Project Structure
+## 📈 For Production
 
+### Using PostgreSQL (Recommended)
+
+Update `prisma/schema.prisma`:
+
+```prisma
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
 ```
-VN-REALESTATE-main/
-├── api/
-│   ├── predict.py          # Vercel serverless function (6KB)
-│   ├── model.txt           # Pre-trained LightGBM (319KB)
-│   ├── encoders.pkl        # Label encoders (1.3KB)
-│   └── metadata.json       # Model info (1KB)
-├── src/
-│   ├── app/                # Next.js pages & API routes
-│   ├── components/         # React components
-│   ├── contexts/           # React contexts
-│   └── lib/                # Utilities & types
-├── Data/
-│   └── merged_properties.csv  # Training data (6,246 properties)
-├── prisma/
-│   ├── schema.prisma       # Database schema
-│   └── dev.db              # SQLite database
-├── train_model.py          # Model training script (run locally)
-├── ml_api.py               # FastAPI server (local dev only)
-├── requirements.txt        # Vercel Python deps (minimal!)
-└── requirements_ml.txt     # Local dev deps (full)
-```
+
+Then:
+1. Add Vercel Postgres
+2. Update DATABASE_URL
+3. Run: `npx prisma migrate deploy`
+4. Seed: `npm run db:seed`
+
+---
+
+## 🎊 Ready to Deploy!
+
+**Your repository**: https://github.com/NamNhiBinhHipHop/VN-RealEstate
+
+**Deploy now:**
+1. Go to [vercel.com](https://vercel.com)
+2. Import repository
+3. Add environment variables
+4. Deploy!
+
+**Everything works out of the box!** 🚀
 
 ---
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
-
----
+Contributions welcome! Submit a PR.
 
 ## 📄 License
 
-This project is open source and available under the MIT License.
+MIT License - Open source
 
 ---
 
 **Made with ❤️ for Vietnamese real estate investors**
 
-🤖 Powered by LightGBM | 🚀 Built with Next.js | 💜 Optimized for Vercel
+🤖 LightGBM AI | 🚀 Built with Next.js | 💜 Optimized for Vercel

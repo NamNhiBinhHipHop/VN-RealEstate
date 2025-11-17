@@ -4,12 +4,12 @@ import { InvestmentCalculator, InvestmentInput } from '@/lib/calculations'
 import { z } from 'zod'
 
 const investmentSchema = z.object({
-  equityCapital: z.number().min(0, 'Vốn chủ sở hữu phải lớn hơn 0'),
-  loanPct: z.number().min(0).max(100, 'Tỷ lệ vay phải từ 0-100%'),
-  propertySize: z.number().min(1, 'Diện tích phải lớn hơn 0'),
-  city: z.string().min(1, 'Thành phố không được để trống'),
+  equityCapital: z.number().min(0, 'Equity must be greater than 0'),
+  loanPct: z.number().min(0).max(100, 'Loan percentage must be between 0 and 100'),
+  propertySize: z.number().min(1, 'Floor area must be greater than 0'),
+  city: z.string().min(1, 'City is required'),
   propertyType: z.enum(['APARTMENT', 'LAND', 'SHOPHOUSE', 'OFFICETEL']),
-  investHorizonYears: z.number().min(1).max(50, 'Thời gian đầu tư từ 1-50 năm'),
+  investHorizonYears: z.number().min(1).max(50, 'Investment horizon must be between 1 and 50 years'),
   bankId: z.string().optional()
 })
 
@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
 
     if (!property) {
       return NextResponse.json(
-        { error: 'Không tìm thấy dữ liệu bất động sản cho loại và thành phố này' },
+        { error: 'No property data found for the selected city and type.' },
         { status: 404 }
       )
     }
@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
 
     if (!marketData) {
       return NextResponse.json(
-        { error: 'Không tìm thấy dữ liệu lãi suất' },
+        { error: 'Interest-rate data is unavailable.' },
         { status: 404 }
       )
     }
@@ -60,8 +60,8 @@ export async function POST(request: NextRequest) {
 
     if (data.equityCapital < requiredEquity) {
       return NextResponse.json(
-        { 
-          error: 'Vốn chủ sở hữu không đủ',
+        {
+          error: 'Equity is not sufficient for this deal.',
           details: {
             propertyPrice,
             loanAmount,
@@ -118,7 +118,7 @@ export async function POST(request: NextRequest) {
 
     console.error('Investment calculation error:', error)
     return NextResponse.json(
-      { error: 'Lỗi server' },
+      { error: 'Server error' },
       { status: 500 }
     )
   }

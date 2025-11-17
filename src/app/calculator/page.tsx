@@ -32,7 +32,7 @@ export default function CalculatorPage() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Đang tải...</p>
+          <p className="text-gray-600">Loading...</p>
         </div>
       </div>
     )
@@ -49,10 +49,10 @@ export default function CalculatorPage() {
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Tính toán đầu tư bất động sản
+            Real estate investment calculator
           </h1>
           <p className="text-gray-600">
-            Nhập thông tin để phân tích khả năng đầu tư và lợi nhuận dự kiến
+            Enter your assumptions to evaluate viability, financing, and returns.
           </p>
         </div>
 
@@ -80,10 +80,10 @@ export default function CalculatorPage() {
                   </svg>
                 </div>
                 <h3 className="text-lg font-medium text-gray-900 mb-2">
-                  Chưa có kết quả tính toán
+                  No calculation yet
                 </h3>
                 <p className="text-gray-500">
-                  Điền thông tin bên trái và nhấn &quot;Tính toán đầu tư&quot; để xem kết quả phân tích
+                  Fill out the form on the left and click “Calculate investment” to view the analysis.
                 </p>
               </div>
             )}

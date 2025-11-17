@@ -162,13 +162,13 @@ export class InvestmentCalculator {
     // Generate alerts
     const alerts: string[] = []
     if (monthlyRentalIncome < monthlyLoanPayment) {
-      alerts.push('Cảnh báo: Thu nhập cho thuê thấp hơn khoản vay hàng tháng')
+      alerts.push('Warning: Rental income does not cover the monthly debt service.')
     }
     if (input.loanPct > 70) {
-      alerts.push('Cảnh báo: Tỷ lệ vay cao (>70%) có thể tăng rủi ro tài chính')
+      alerts.push('Warning: High leverage (>70%) could increase financial risk.')
     }
     if (scenarios.base.roi < 10) {
-      alerts.push('Cảnh báo: ROI dự kiến thấp (<10%/năm)')
+      alerts.push('Warning: Projected ROI is low (<10% per year).')
     }
     
     return {

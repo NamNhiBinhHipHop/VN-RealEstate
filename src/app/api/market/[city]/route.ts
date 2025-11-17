@@ -18,7 +18,7 @@ export async function GET(
 
     if (properties.length === 0) {
       return NextResponse.json(
-        { error: 'Không tìm thấy dữ liệu cho thành phố này' },
+        { error: 'No market data found for this city.' },
         { status: 404 }
       )
     }
@@ -38,7 +38,7 @@ export async function GET(
   } catch (error) {
     console.error('Market data error:', error)
     return NextResponse.json(
-      { error: 'Lỗi server' },
+      { error: 'Server error' },
       { status: 500 }
     )
   }

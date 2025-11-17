@@ -4,9 +4,9 @@ import { AuthService } from '@/lib/auth'
 import { z } from 'zod'
 
 const registerSchema = z.object({
-  name: z.string().min(2, 'Tên phải có ít nhất 2 ký tự'),
-  email: z.string().email('Email không hợp lệ'),
-  password: z.string().min(6, 'Mật khẩu phải có ít nhất 6 ký tự')
+  name: z.string().min(2, 'Name must be at least 2 characters'),
+  email: z.string().email('Invalid email address'),
+  password: z.string().min(6, 'Password must be at least 6 characters')
 })
 
 export async function POST(request: NextRequest) {
@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
 
     if (existingUser) {
       return NextResponse.json(
-        { error: 'Email đã được sử dụng' },
+        { error: 'Email is already in use' },
         { status: 400 }
       )
     }
@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
     })
 
     return NextResponse.json({
-      message: 'Đăng ký thành công',
+      message: 'Registration successful',
       token,
       user: {
         id: user.id,
@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
 
     console.error('Registration error:', error)
     return NextResponse.json(
-      { error: 'Lỗi server' },
+      { error: 'Server error' },
       { status: 500 }
     )
   }

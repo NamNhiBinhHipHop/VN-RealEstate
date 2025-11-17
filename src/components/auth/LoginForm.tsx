@@ -30,7 +30,7 @@ export function LoginForm({ onToggleMode }: LoginFormProps) {
       if (err instanceof ApiError) {
         setError(err.message)
       } else {
-        setError('Đã xảy ra lỗi không mong muốn')
+        setError('An unexpected error occurred.')
       }
     } finally {
       setIsLoading(false)
@@ -40,9 +40,9 @@ export function LoginForm({ onToggleMode }: LoginFormProps) {
   return (
     <Card className="w-full max-w-md">
       <CardHeader>
-        <CardTitle>Đăng nhập</CardTitle>
+        <CardTitle>Sign in</CardTitle>
         <CardDescription>
-          Đăng nhập vào tài khoản của bạn để sử dụng công cụ tính toán
+          Access your dashboard to run calculations and save scenarios.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -69,7 +69,7 @@ export function LoginForm({ onToggleMode }: LoginFormProps) {
           
           <div className="space-y-2">
             <label htmlFor="password" className="text-sm font-medium">
-              Mật khẩu
+              Password
             </label>
             <Input
               id="password"
@@ -82,7 +82,7 @@ export function LoginForm({ onToggleMode }: LoginFormProps) {
           </div>
           
           <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? 'Đang đăng nhập...' : 'Đăng nhập'}
+            {isLoading ? 'Signing in...' : 'Sign in'}
           </Button>
           
           <div className="text-center">
@@ -91,7 +91,7 @@ export function LoginForm({ onToggleMode }: LoginFormProps) {
               onClick={onToggleMode}
               className="text-sm text-blue-600 hover:underline"
             >
-              Chưa có tài khoản? Đăng ký ngay
+              Need an account? Create one
             </button>
           </div>
         </form>

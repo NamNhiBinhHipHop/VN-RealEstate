@@ -53,7 +53,7 @@ export const GET = withAuth(async (request: NextRequest, user) => {
   } catch (error) {
     console.error('List scenarios error:', error)
     return NextResponse.json(
-      { error: 'Lỗi server' },
+      { error: 'Server error' },
       { status: 500 }
     )
   }
