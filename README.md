@@ -63,7 +63,7 @@ npm run dev
 
 ### How it works
 
-1. Run `python train_model.py` (or reuse the committed artifacts) against `Data/merged_properties.csv`.
+1. Run `python train_model.py` (or reuse the committed artifacts) against `data/merged_properties.csv`.
 2. The script outputs:
    - `api/model.json`: the full forest for the Next.js runtime
    - `api/encoders.json`: lookup tables for locations/districts
@@ -248,7 +248,7 @@ VN-RealEstate/
 ├── prisma/
 │   ├── schema.prisma             # Database schema
 │   └── dev.db                    # SQLite database
-├── Data/
+├── data/
 │   └── merged_properties.csv     # Training data (6,246 properties)
 ├── api/
 │   ├── model.json                # Exported tree structures (used by API)

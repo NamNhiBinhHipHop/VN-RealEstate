@@ -18,7 +18,7 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 
-DATA_PATH = Path("Data/merged_properties.csv")
+DATA_PATH = Path("data/merged_properties.csv")
 API_DIR = Path("api")
 RUNTIME_DIR = API_DIR  # keep exported trees inside api/ as requested
 
