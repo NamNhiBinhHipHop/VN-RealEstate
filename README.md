@@ -5,11 +5,17 @@ A sophisticated Next.js application for analyzing real estate investments in Vie
 ## 🌟 Features
 
 ### 🤖 **LightGBM Price Prediction**
-- Mô hình Gradient Boosting huấn luyện trên **6,246** giao dịch thật
-- Dự đoán giá theo phòng ngủ, diện tích và khu vực cụ thể
-- **23+ khu vực** tại TP. Hồ Chí Minh
-- Xuất giá/m², kết quả chuẩn hóa theo dữ liệu lịch sử
-- Mô hình đã huấn luyện sẵn, chỉ cần commit file tree → chạy trực tiếp trên Vercel
+- Gradient Boosting model trained on **6,246** verified transactions
+- Predicts price by bedrooms, floor area, and district in HCMC
+- Returns formatted total price + price per m²
+- Ships as JSON artifacts (`api/model.json`, `api/encoders.json`) so Vercel only needs Next.js
+
+### 🗺️ **District Price Map**
+- Interactive Mapbox GL choropleth for Hồ Chí Minh City (`/map`)
+- Builds polygons per district/huyện from `public/data/hcmc_districts.geojson`
+- Colors driven by aggregated stats from `/api/district-stats`
+- Hover tooltips + legend + “Reset view” button + filter controls
+- Requires `NEXT_PUBLIC_MAPBOX_TOKEN`
 
 ### 💰 **Investment Calculator**
 - Calculate ROI, IRR, and monthly cash flow
@@ -55,32 +61,32 @@ npm run dev
 
 ## 🤖 LightGBM Price Estimation
 
-### Cách hoạt động
+### How it works
 
-1. Chạy `python train_model.py` (hoặc dùng file đã commit) để huấn luyện LightGBM với dữ liệu `Data/merged_properties.csv`.
-2. Script tự động xuất:
-   - `api/model.json`: toàn bộ cây quyết định để Next.js sử dụng
-   - `api/encoders.json`: mapping location/district → index
-   - `api/model.txt`, `api/encoders.pkl`, `api/metadata.json` (tham khảo)
-3. Next.js API `/api/predict` nạp các file này, thực thi toàn bộ 140 cây để trả về giá dự đoán.
+1. Run `python train_model.py` (or reuse the committed artifacts) against `Data/merged_properties.csv`.
+2. The script outputs:
+   - `api/model.json`: the full forest for the Next.js runtime
+   - `api/encoders.json`: lookup tables for locations/districts
+   - `api/model.txt`, `api/encoders.pkl`, `api/metadata.json` (reference/original LightGBM files)
+3. `/api/predict` loads those JSON files, rebuilds the feature vector, and walks all 140 trees per request.
 
-**Input người dùng:**
-- Phòng ngủ (1-10)
-- Diện tích (m²)
-- Khu vực (23+ quận/huyện TP.HCM)
+**Inputs:**
+- Bedrooms (1-10)
+- Floor area (m²)
+- District/huyện (23+ supported)
 
-**Quy trình dự đoán:**
-1. Encode location/district thành chỉ số giống hệt khi huấn luyện
-2. Tính `bedroom_density = bedrooms / area`
-3. Tạo vector đặc trưng theo đúng thứ tự LightGBM (`bedrooms`, `area`, `location_encoded`, `district_encoded`, `bedroom_density`)
-4. Duyệt lần lượt 140 cây (Gradient Boosting) để cộng dồn giá trị dự đoán
+**Prediction pipeline:**
+1. Encode district + location exactly like the training job
+2. Compute `bedroom_density = bedrooms / area`
+3. Build `[bedrooms, area, location_encoded, district_encoded, bedroom_density]`
+4. Sum every tree’s contribution (Gradient Boosting Decision Tree)
 
-**Kết quả:**
-- Giá dự đoán (tỷ VND)
-- Giá/m²
-- Nguồn mô hình: “LightGBM gradient boosting (pre-trained)”
+**Outputs:**
+- Total price (billions of VND)
+- Price per square meter
+- Metadata: `method: "LightGBM gradient boosting (pre-trained)"`
 
-### Huấn luyện lại (tùy chọn)
+### Re-training (optional)
 
 ```bash
 python3 -m venv .venv
@@ -89,7 +95,7 @@ pip install -r requirements_ml.txt
 python train_model.py
 ```
 
-Script sẽ tạo/ghi đè các file trong thư mục `api/`. Commit chúng trước khi deploy lên Vercel.
+The script overwrites artifacts inside `api/`. Commit them before deploying to Vercel.
 
 ### Supported Locations
 
@@ -97,6 +103,16 @@ Script sẽ tạo/ghi đè các file trong thư mục `api/`. Commit chúng trư
 - Quận 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
 - Quận Bình Thạnh, Bình Tân, Gò Vấp, Phú Nhuận, Tân Bình, Tân Phú
 - Huyện Bình Chánh, Củ Chi, Hóc Môn, Nhà Bè
+
+---
+
+## 🗺️ District Choropleth Map
+
+1. GeoJSON boundaries live at `public/data/hcmc_districts.geojson`. They can be replaced with more detailed shapes if needed.
+2. Aggregated stats (avg. price + listing count) are stored in `data/district_stats.json` and served via `/api/district-stats`.
+3. The `HCMCChoropleth` component (`src/components/maps/HCMCChoropleth.tsx`) is client-only, powered by Mapbox GL JS, and accepts `{ district, avgPrice, count }[]`.
+4. `/map` renders the map + filter controls; it automatically updates fill colors when filters change.
+5. Remember to set `NEXT_PUBLIC_MAPBOX_TOKEN` in `.env` or the Vercel dashboard.
 
 ---
 
@@ -132,6 +148,8 @@ npm run db:studio    # Open Prisma Studio GUI
    ```
    DATABASE_URL=file:./prisma/dev.db
    JWT_SECRET=<generate-32-char-random>
+   NEXT_PUBLIC_MAPBOX_TOKEN=<your-public-mapbox-token>
+   NEXT_PUBLIC_ML_API_URL=<optional-external-endpoint>
    ```
    
    Generate JWT:
@@ -180,6 +198,7 @@ Using **Prisma ORM** with 4 models:
 - `GET /api/predict` - Health check
 - `GET /api/predict?locations=true` - List locations
 - `POST /api/predict` - LightGBM price prediction
+- `GET /api/district-stats` - Aggregated district pricing for the choropleth map
 
 ### Market Data
 - `GET /api/market/[city]` - Get property data

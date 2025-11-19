@@ -45,6 +45,12 @@ export function Header() {
               >
                 Compare
               </Link>
+              <Link
+                href="/map"
+                className="text-gray-600 hover:text-gray-900 font-medium"
+              >
+                Price map
+              </Link>
             </nav>
             
             <div className="flex items-center space-x-2">

@@ -22,6 +22,7 @@
     "clsx": "^2.1.1",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.544.0",
+    "mapbox-gl": "^3.16.0",
     "next": "15.5.4",
     "prisma": "^6.16.2",
     "react": "19.1.0",

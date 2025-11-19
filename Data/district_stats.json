@@ -1,0 +1,112 @@
+[
+  {
+    "district": "Huyện Bình Chánh",
+    "avgPrice": 7.64,
+    "count": 206
+  },
+  {
+    "district": "Huyện Củ Chi",
+    "avgPrice": 4.56,
+    "count": 168
+  },
+  {
+    "district": "Huyện Hóc Môn",
+    "avgPrice": 6.69,
+    "count": 168
+  },
+  {
+    "district": "Huyện Nhà Bè",
+    "avgPrice": 11.09,
+    "count": 322
+  },
+  {
+    "district": "Quận 1",
+    "avgPrice": 50.11,
+    "count": 343
+  },
+  {
+    "district": "Quận 10",
+    "avgPrice": 26.29,
+    "count": 326
+  },
+  {
+    "district": "Quận 11",
+    "avgPrice": 17.16,
+    "count": 261
+  },
+  {
+    "district": "Quận 12",
+    "avgPrice": 7.26,
+    "count": 310
+  },
+  {
+    "district": "Quận 2",
+    "avgPrice": 31.76,
+    "count": 247
+  },
+  {
+    "district": "Quận 3",
+    "avgPrice": 50.53,
+    "count": 335
+  },
+  {
+    "district": "Quận 4",
+    "avgPrice": 9.46,
+    "count": 246
+  },
+  {
+    "district": "Quận 5",
+    "avgPrice": 34.5,
+    "count": 182
+  },
+  {
+    "district": "Quận 6",
+    "avgPrice": 13.73,
+    "count": 283
+  },
+  {
+    "district": "Quận 7",
+    "avgPrice": 14.33,
+    "count": 335
+  },
+  {
+    "district": "Quận 8",
+    "avgPrice": 8.46,
+    "count": 327
+  },
+  {
+    "district": "Quận 9",
+    "avgPrice": 15.33,
+    "count": 246
+  },
+  {
+    "district": "Quận Bình Thạnh",
+    "avgPrice": 16.31,
+    "count": 375
+  },
+  {
+    "district": "Quận Bình Tân",
+    "avgPrice": 9.53,
+    "count": 256
+  },
+  {
+    "district": "Quận Gò Vấp",
+    "avgPrice": 9.03,
+    "count": 390
+  },
+  {
+    "district": "Quận Phú Nhuận",
+    "avgPrice": 17.37,
+    "count": 406
+  },
+  {
+    "district": "Quận Tân Bình",
+    "avgPrice": 16.21,
+    "count": 427
+  },
+  {
+    "district": "Quận Tân Phú",
+    "avgPrice": 14.13,
+    "count": 87
+  }
+]
